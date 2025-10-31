@@ -6,7 +6,6 @@ import '../services/api_service.dart';
 class PlaceorderRepository {
   final _dio = ApiService.dio;
 
-  /// API call to place order without sending any bodyR
   Future<PlaceorderResponse> placeOrder(PlaceOrderRequest request) async {
     final response = await _dio.post(
       ApiConstants.placeorderurl,

@@ -22,16 +22,25 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-
   final CartItemController cartitemController = Get.find<CartItemController>();
-  final RemoveCartItemController removeCartItemController = Get.put(RemoveCartItemController(),);
-  final ReduceQuantityController reduceQuantityController = Get.put(ReduceQuantityController());
-  final IncreaseQuantityController increaseQuantityController = Get.put(IncreaseQuantityController());
+  final RemoveCartItemController removeCartItemController = Get.put(
+    RemoveCartItemController(),
+  );
+  final ReduceQuantityController reduceQuantityController = Get.put(
+    ReduceQuantityController(),
+  );
+  final IncreaseQuantityController increaseQuantityController = Get.put(
+    IncreaseQuantityController(),
+  );
+
+  /// 🟢 Map to track which item is loading
+  final RxMap<String, bool> removeLoading = <String, bool>{}.obs;
+  final RxMap<String, bool> increaseLoading = <String, bool>{}.obs;
+  final RxMap<String, bool> decreaseLoading = <String, bool>{}.obs;
 
   @override
   void initState() {
     super.initState();
-    // ✅ Call API when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cartitemController.fetchItems();
     });
@@ -59,15 +68,13 @@ class _CartScreenState extends State<CartScreen> {
               ),
             )
           : const CustomTextAppBar(title: "Cart"),
-
       body: Obx(() {
         if (cartitemController.isLoading.value) {
-          /// 🔹 Show Loader
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (cartitemController.errorMessage.isNotEmpty) {
-          return Center(
+        if (cartitemController.cartItems.isEmpty) {
+          return const Center(
             child: Text(
               "Your cart is empty",
               style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -77,17 +84,6 @@ class _CartScreenState extends State<CartScreen> {
 
         final cartItems = cartitemController.cartItems;
 
-        if (cartItems.isEmpty) {
-          /// 🔹 Empty Cart Message
-          return const Center(
-            child: Text(
-              "Your cart is empty",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          );
-        }
-
-        /// 🔹 Cart List
         return Stack(
           children: [
             Column(
@@ -103,183 +99,292 @@ class _CartScreenState extends State<CartScreen> {
                     itemCount: cartItems.length,
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
+                      final id = item.id.toString();
                       final imageUrl = item.product.image.isNotEmpty
                           ? "${ApiConstants.imageBaseUrl}${item.product.image}"
                           : "assets/images/banner2.jpg";
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Image.network(
-                                      imageUrl,
-                                      width: 130,
-                                      height: 90,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const Icon(Icons.image, size: 50),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
 
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                      return Obx(() {
+                        final isRemoveLoading = removeLoading[id] ?? false;
+
+                        final isIncLoading = increaseLoading[id] ?? false;
+                        final isDecLoading = decreaseLoading[id] ?? false;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: Image.network(
+                                        imageUrl,
+                                        width: 130,
+                                        height: 90,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Icon(Icons.image, size: 50),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.product.name,
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            "${item.product.weight} kg  |  Qty: ${item.quantity}",
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            "₹${item.total.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green[700],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const Divider(height: 1, thickness: 1),
+
+                              /// ✅ Quantity & Remove Section
+                              Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () async {
+                                        removeLoading[id] = true;
+                                        await removeCartItemController
+                                            .removeCartItem(id);
+                                        removeLoading[id] = false;
+
+                                        if (removeCartItemController
+                                            .successMessage
+                                            .value
+                                            .isNotEmpty) {
+                                          ToastUtil.showSuccess(
+                                            removeCartItemController
+                                                .successMessage
+                                                .value,
+                                          );
+                                          cartitemController.cartItems.removeAt(
+                                            index,
+                                          );
+                                        } else {
+                                          ToastUtil.showError(
+                                            removeCartItemController
+                                                .errorMessage
+                                                .value,
+                                          );
+                                        }
+                                      },
+                                      icon: isRemoveLoading
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.delete_outline,
+                                              size: 18,
+                                            ),
+                                      label: const Text("Remove"),
+                                    ),
+
+                                    /// Quantity buttons
+                                    Row(
                                       children: [
-                                        Text(
-                                          "${item.product.name}",
-                                          // \n(ID: ${item.product.id})",
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                        // – Button
+                                        IconButton(
+                                          onPressed: isDecLoading
+                                              ? null
+                                              : () async {
+                                                  if (item.quantity > 1) {
+                                                    decreaseLoading[id] = true;
+
+                                                    final oldQty =
+                                                        item.quantity;
+                                                    item.quantity--;
+                                                    final double price =
+                                                        double.tryParse(
+                                                          item.product.price
+                                                              .toString(),
+                                                        ) ??
+                                                        0.0;
+                                                    item.total =
+                                                        price * item.quantity;
+
+                                                    cartitemController.update();
+
+                                                    await reduceQuantityController
+                                                        .reduceQuantity(id);
+
+                                                    decreaseLoading[id] = false;
+
+                                                    if (reduceQuantityController
+                                                        .isSuccess
+                                                        .isTrue) {
+                                                      ToastUtil.showSuccess(
+                                                        reduceQuantityController
+                                                            .message
+                                                            .value,
+                                                      );
+                                                    } else {
+                                                      item.quantity = oldQty;
+                                                      final double price =
+                                                          double.tryParse(
+                                                            item.product.price
+                                                                .toString(),
+                                                          ) ??
+                                                          0.0;
+                                                      item.total =
+                                                          price * item.quantity;
+
+                                                      cartitemController
+                                                          .update();
+                                                      ToastUtil.showError(
+                                                        reduceQuantityController
+                                                            .message
+                                                            .value,
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                          icon: isDecLoading
+                                              ? const SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                )
+                                              : const Icon(Icons.remove),
                                         ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          " ${item.weight} kg  |  Qty: ${item.quantity}",
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          "₹${item.total.toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green[700],
-                                          ),
+
+                                        Text("${item.quantity}"),
+
+                                        // + Button
+                                        IconButton(
+                                          onPressed: isIncLoading
+                                              ? null
+                                              : () async {
+                                                  increaseLoading[id] = true;
+
+                                                  final oldQty = item.quantity;
+                                                  item.quantity++;
+                                                  final double price =
+                                                      double.tryParse(
+                                                        item.product.price
+                                                            .toString(),
+                                                      ) ??
+                                                      0.0;
+                                                  item.total =
+                                                      price * item.quantity;
+
+                                                  cartitemController.update();
+
+                                                  await increaseQuantityController
+                                                      .increaseQuantity(id);
+
+                                                  increaseLoading[id] = false;
+
+                                                  if (increaseQuantityController
+                                                      .isSuccess
+                                                      .isTrue) {
+                                                    ToastUtil.showSuccess(
+                                                      increaseQuantityController
+                                                          .message
+                                                          .value,
+                                                    );
+                                                  } else {
+                                                    item.quantity = oldQty;
+                                                    final double price =
+                                                        double.tryParse(
+                                                          item.product.price
+                                                              .toString(),
+                                                        ) ??
+                                                        0.0;
+                                                    item.total =
+                                                        price * item.quantity;
+
+                                                    cartitemController.update();
+                                                    ToastUtil.showError(
+                                                      increaseQuantityController
+                                                          .message
+                                                          .value,
+                                                    );
+                                                  }
+                                                },
+                                          icon: isIncLoading
+                                              ? const SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                )
+                                              : const Icon(Icons.add),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-
-                            const Divider(height: 1, thickness: 1),
-
-                            /// Quantity + Remove
-                            Padding(
-                              padding: const EdgeInsets.all(6),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton.icon(
-                                    onPressed: () async {
-                                      final id = item.id.toString();
-                                      await removeCartItemController
-                                          .removeCartItem(id);
-
-                                      if (removeCartItemController
-                                          .successMessage
-                                          .isNotEmpty) {
-                                        ToastUtil.showSuccess(removeCartItemController.successMessage.value);
-                                        cartitemController
-                                            .fetchItems();
-                                      } else if (removeCartItemController
-                                          .errorMessage
-                                          .isNotEmpty) {
-                                        ToastUtil.showError(removeCartItemController.errorMessage.value);
-                                      }
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete_outline,
-                                      size: 18,
-                                    ),
-                                    label: const Text("Remove"),
-                                  ),
-
-                                  /// Quantity selector
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () async {
-                                          await reduceQuantityController
-                                              .reduceQuantity(id);
-
-                                          if (reduceQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            ToastUtil.showSuccess(reduceQuantityController
-                                                .message
-                                                .value);
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            ToastUtil.showError(reduceQuantityController
-                                                .message
-                                                .value);
-                                          }
-                                        },
-
-                                        icon: const Icon(Icons.remove),
-                                      ),
-                                      Text("${item.quantity}"),
-
-                                      IconButton(
-                                        onPressed: () async {
-                                          await increaseQuantityController
-                                              .increaseQuantity(id);
-
-                                          if (increaseQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            ToastUtil.showSuccess(increaseQuantityController
-                                                .message
-                                                .value);
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            ToastUtil.showError(increaseQuantityController
-                                                .message
-                                                .value);
-                                          }
-                                        },
-
-                                        icon: const Icon(Icons.add),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                            ],
+                          ),
+                        );
+                      });
                     },
                   ),
                 ),
               ],
             ),
 
-            /// 🔹 Checkout Bottom Bar
+            /// ✅ Floating Checkout Bar
             FloatingCartBarWidget(
               totalItems: cartitemController.totalItems,
               totalPrice: cartitemController.totalPrice,
               buttonText: "Checkout",
-              onTap: () {
-                Get.toNamed(AppRoutes.Checkout);
-              },
+              onTap: () => Get.toNamed(AppRoutes.Checkout),
             ),
           ],
         );

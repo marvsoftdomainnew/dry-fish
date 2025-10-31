@@ -13,18 +13,22 @@ class PlaceOrderController extends GetxController {
   Future<void> placeOrderCont(PlaceOrderRequest request) async {
     isLoading.value = true;
     try {
-      final response = await _repository.placeOrder();
+      // ✅ FIXED: pass request in API call
+      final response = await _repository.placeOrder(request);
 
-      if (response.status?.toLowerCase() == "success") {
+      if (response.status == "success") {
         order.value = response.order;
-        SnackbarUtil.showSuccess("Order Placed",
-          response.message ?? "Your order has been placed successfully!",
+
+        SnackbarUtil.showSuccess(
+          "Order Placed",
+  response.message ?? "",
         );
+
         Get.offAllNamed(AppRoutes.orderConfirmer);
       } else {
         SnackbarUtil.showError(
           "Order Failed",
-          response.message ?? "Something went wrong while placing order.",
+  response.message ?? "",
         );
       }
     } catch (e) {
@@ -32,7 +36,6 @@ class PlaceOrderController extends GetxController {
         "Error",
         "An unexpected error occurred: ${e.toString()}",
       );
-
     } finally {
       isLoading.value = false;
     }
