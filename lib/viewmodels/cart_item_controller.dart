@@ -1,12 +1,16 @@
 import 'package:get/get.dart';
-import '../../models/responses/cart_response.dart';
-import '../../repositories/cart_repository.dart';
+import '../models/responses/cart_response.dart';
+import '../repositories/cart_repository.dart';
 
 class CartItemController extends GetxController {
   final _repo = CartItemRepo();
+
+  /// Observables
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final cartItems = <CartItem>[].obs;
+
+  /// Totals
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
 
@@ -15,24 +19,25 @@ class CartItemController extends GetxController {
   void initItemLoaders() {
     for (var item in cartItems) {
       itemLoading[item.id] ??= false.obs;
-    }
+        }
   }
 
   Future<void> fetchItems() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
+
       final response = await _repo.fetchcartItems();
 
-      if (response.success == true &&
-          response.cart.isNotEmpty) {
-        cartItems.assignAll(response.cart);
+      if (response.success == true) {
+        cartItems.assignAll(response.cart!);
       } else {
         cartItems.clear();
-        print("⚠️ API says cart is empty");
+        print("⚠️ API says cart is empty or null");
       }
 
       updateTotals();
+      initItemLoaders();
     } catch (e) {
       errorMessage.value = 'Error: ${e.toString()}';
       print("❌ Error fetching cart: $e");
@@ -42,14 +47,14 @@ class CartItemController extends GetxController {
   }
 
   void updateTotals() {
-    totalItems.value = cartItems.fold(
+    totalItems.value = cartItems.fold<int>(
       0,
-      (sum, item) => sum + (item.quantity),
+          (sum, item) => sum + (item.quantity ?? 0),
     );
 
-    totalPrice.value = cartItems.fold(
+    totalPrice.value = cartItems.fold<double>(
       0.0,
-      (sum, item) => sum + (item.total),
+          (sum, item) => sum + (item.total ?? 0.0),
     );
   }
 }

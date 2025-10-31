@@ -38,7 +38,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double get subtotal =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.total);
 
-  double get totalAmount => subtotal + shippingFee + handlingFee;
+  double get totalAmount => subtotal;
 
   int get totalItems =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.quantity);
@@ -107,7 +107,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           SizedBox(height: 0.5.h),
                           Text(
                             selectedAddress != null
-                                ? "${selectedAddress!.name}, ${selectedAddress!.flat}, ${selectedAddress!.street}, ${selectedAddress!.building}, ${selectedAddress!.locality}, ${selectedAddress!.city}, ${selectedAddress!.state} - ${selectedAddress!.zip}"
+                                ? "${selectedAddress!.name}, ${selectedAddress!.flat}, ${selectedAddress!.street}, ${selectedAddress!.city}, ${selectedAddress!.state} - ${selectedAddress!.zip}"
                                 : "Select delivery address",
                             style: TextStyle(
                               fontSize: 13.sp,
@@ -198,7 +198,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 SizedBox(height: 0.5.h),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Qty: ${item.quantity}",
@@ -244,11 +244,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: Column(
                   children: [
                     _priceRow("Item Subtotal", subtotal),
-                    _priceRow("Shipping", shippingFee),
-                    _priceRow("Handling Fee", handlingFee),
+                    // _priceRow("Shipping", shippingFee),
+                    // _priceRow("Handling Fee", handlingFee),
                     const Divider(),
-                    _priceRow("Total Amount", totalAmount,
-                        isBold: true, color: Colors.green[700]),
+                    _priceRow(
+                      "Total Amount",
+                      totalAmount,
+                      isBold: true,
+                      color: Colors.green[700],
+                    ),
                   ],
                 ),
               ),
@@ -272,59 +276,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             onPressed: orderController.isLoading.value
                 ? null
                 : () async {
-                    if (cartController.cartItems.isEmpty) return;
+              if (cartController.cartItems.isEmpty) return;
 
-                    final prefs = await SharedPreferencesService.getInstance();
-                    final latitude = prefs.getDouble(AppKeys.latitude);
-                    final longitude = prefs.getDouble(AppKeys.longitude);
+              final prefs =
+              await SharedPreferencesService.getInstance();
+              final latitude = prefs.getDouble(AppKeys.latitude);
+              final longitude = prefs.getDouble(AppKeys.longitude);
 
-                    final firstItem = cartController.cartItems.first;
+              final firstItem = cartController.cartItems.first;
 
-                    final request = PlaceOrderRequest(
-                      userId: firstItem.userId,
-                      recipientName: "John Doe",
-                      recipientPhone: "9876543210",
-                      deliveryAddress: selectedAddress != null
-                          ? "${selectedAddress!.flat}, ${selectedAddress!.street}, ${selectedAddress!.building}, ${selectedAddress!.locality}"
-                          : "Not Selected",
-                      deliveryCity: selectedAddress?.city ?? "",
-                      deliveryState: selectedAddress?.state ?? "",
-                      deliveryPostcode: selectedAddress?.zip ?? "",
-                      totalAmount: totalAmount,
-                      paymentStatus: "paid",
-                      orderStatus: "dispatched",
-                      dispatchedAt: DateTime.now().toString(),
-                      deliveredAt: null,
-                      notes: "Handle with care.",
-                      latitude: latitude,
-                      longitude: longitude,
-                    );
+              final request = PlaceOrderRequest(
+                latitude: latitude,
+                longitude: longitude,
+              );
 
-                    await orderController.placeOrderCont(request);
-                  },
+              await orderController.placeOrderCont(request);
+            },
             child: orderController.isLoading.value
                 ? const CircularProgressIndicator(color: Colors.white)
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "$totalItems Items | ₹${totalAmount.toStringAsFixed(0)}",
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Text(
-                        "Place Order",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "$tItems Items | ₹${total.toStringAsFixed(0)}",
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
                   ),
+                ),
+                const Text(
+                  "Place Order",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }),
