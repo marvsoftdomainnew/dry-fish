@@ -30,9 +30,8 @@ class CartItem {
   final int userId;
   final int productId;
    int quantity;
-  final double price;
-  final double weight;
-  final double total;
+   double price;
+   double total;
   final String status;
   final String createdAt;
   final String updatedAt;
