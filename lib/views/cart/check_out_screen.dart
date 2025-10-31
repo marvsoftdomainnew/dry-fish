@@ -119,8 +119,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        final selected =
-                            await Get.toNamed(AppRoutes.savedaddresses);
+                        final selected = await Get.toNamed(
+                          AppRoutes.savedaddresses,
+                        );
                         if (selected != null) {
                           setState(() => selectedAddress = selected);
                         }
@@ -198,7 +199,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 SizedBox(height: 0.5.h),
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Qty: ${item.quantity}",
@@ -263,6 +264,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       /// PLACE ORDER BUTTON
       bottomNavigationBar: Obx(() {
+        final tItems = totalItems;
+        final total = totalAmount;
         return Container(
           margin: EdgeInsets.only(bottom: 4.h, left: 4.w, right: 4.w),
           height: 6.5.h,
@@ -276,53 +279,56 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             onPressed: orderController.isLoading.value
                 ? null
                 : () async {
-              if (cartController.cartItems.isEmpty) return;
+                    if (cartController.cartItems.isEmpty) return;
 
-              final prefs =
-              await SharedPreferencesService.getInstance();
-              final latitude = prefs.getDouble(AppKeys.latitude);
-              final longitude = prefs.getDouble(AppKeys.longitude);
+                    final prefs = await SharedPreferencesService.getInstance();
+                    final latitude = prefs.getDouble(AppKeys.latitude);
+                    final longitude = prefs.getDouble(AppKeys.longitude);
 
-              final firstItem = cartController.cartItems.first;
+                    final firstItem = cartController.cartItems.first;
 
-              final request = PlaceOrderRequest(
-                latitude: latitude,
-                longitude: longitude,
-              );
+                    final request = PlaceOrderRequest(
+                      latitude: latitude,
+                      longitude: longitude,
+                    );
 
-              await orderController.placeOrderCont(request);
-            },
+                    await orderController.placeOrderCont(request);
+                  },
             child: orderController.isLoading.value
                 ? const CircularProgressIndicator(color: Colors.white)
                 : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "$tItems Items | ₹${total.toStringAsFixed(0)}",
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "$tItems Items | ₹${total.toStringAsFixed(0)}",
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "Place Order",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const Text(
-                  "Place Order",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       }),
     );
   }
 
-  Widget _priceRow(String title, double value,
-      {bool isBold = false, Color? color}) {
+  Widget _priceRow(
+    String title,
+    double value, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
