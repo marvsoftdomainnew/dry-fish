@@ -326,7 +326,10 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(size.width * 0.02),
-                borderSide: const BorderSide(color: Colors.red, width: 1.2),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 1.2,
+                ),
               ),
             ),
           ),
@@ -404,6 +407,13 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(width * 0.02),
                       borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(width * 0.02),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.2,
+                      ),
                     ),
                   ),
                 ),

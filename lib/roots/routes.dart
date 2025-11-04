@@ -8,7 +8,7 @@ import 'package:dry_fish/views/contact_us_screen.dart';
 import 'package:dry_fish/views/dashboard/dasboard_screen.dart';
 import 'package:dry_fish/views/onboarding/onboarding_screen.dart';
 import 'package:dry_fish/views/order/order_confirmation_screen.dart';
-import 'package:dry_fish/views/order/order_screen.dart';
+import 'package:dry_fish/views/order/order_history_screen.dart';
 import 'package:dry_fish/views/order/order_tracking_screen.dart';
 import 'package:dry_fish/views/products/product_detail_screen.dart';
 import 'package:dry_fish/views/products/product_list_screen.dart';
@@ -29,6 +29,7 @@ class AppRoutes {
   static const search = '/search';
   static const Checkout = '/Checkout';
   static const order = '/order';
+  static const orderDetails = '/orderDetails';
   static const contact = '/contact';
   static const productScreen = '/productScreen';
   static const productDetail = '/productDetail';
@@ -63,6 +64,7 @@ class AppRoutes {
       _buildPage(name: search, page: () => SearchScreen()),
       _buildPage(name: Checkout, page: () => CheckoutScreen()),
       _buildPage(name: order, page: () => OrderScreen()),
+      _buildPage(name: orderDetails, page: () => OrderScreen()),
       _buildPage(name: contact, page: () => ContactUsScreen()),
       _buildPage(name: productScreen, page: () => ProductListScreen()),
       _buildPage(name: productDetail, page: () => ProductDetailScreen()),

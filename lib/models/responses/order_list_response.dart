@@ -16,6 +16,7 @@ class OrderListResponse {
     );
   }
 }
+
 class Order {
   final int id;
   final String orderNumber;
@@ -24,7 +25,6 @@ class Order {
   final String paymentStatus;
   final String orderStatus;
   final String createdAt;
-  final String? deliveredAt;
   final List<OrderItem> orderItems;
 
   Order({
@@ -35,7 +35,6 @@ class Order {
     required this.paymentStatus,
     required this.orderStatus,
     required this.createdAt,
-    required this.deliveredAt,
     required this.orderItems,
   });
 
@@ -48,7 +47,6 @@ class Order {
       paymentStatus: json["payment_status"] ?? "",
       orderStatus: json["order_status"] ?? "",
       createdAt: json["created_at"] ?? "",
-      deliveredAt: json["delivered_at"],
       orderItems: json["order_items"] != null
           ? List<OrderItem>.from(
               json["order_items"].map((x) => OrderItem.fromJson(x)))
@@ -56,12 +54,17 @@ class Order {
     );
   }
 }
+
 class OrderItem {
   final int id;
   final int productId;
   final int quantity;
   final double price;
   final double total;
+  final String? cuttingType;
+  final String? weight;
+  final String? status;
+  final Product? product;
 
   OrderItem({
     required this.id,
@@ -69,6 +72,10 @@ class OrderItem {
     required this.quantity,
     required this.price,
     required this.total,
+    this.cuttingType,
+    this.weight,
+    this.status,
+    this.product,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
@@ -78,6 +85,46 @@ class OrderItem {
       quantity: json["quantity"] ?? 0,
       price: double.tryParse(json["price"].toString()) ?? 0.0,
       total: double.tryParse(json["total"].toString()) ?? 0.0,
+      cuttingType: json["cutting_type"],
+      weight: json["weight"]?.toString(),
+      status: json["status"],
+      product:
+          json["product"] != null ? Product.fromJson(json["product"]) : null,
+    );
+  }
+}
+
+class Product {
+  final int id;
+  final int categoryId;
+  final int subCategoryId;
+  final String name;
+  final String description;
+  final String price;
+  final String image;
+  final int stock;
+
+  Product({
+    required this.id,
+    required this.categoryId,
+    required this.subCategoryId,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.image,
+    required this.stock,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json["id"] ?? 0,
+      categoryId: json["category_id"] ?? 0,
+      subCategoryId: json["sub_category_id"] ?? 0,
+      name: json["name"] ?? "",
+      description: json["description"] ?? "",
+      price: json["price"]?.toString() ?? "0",
+      image: json["image"] ?? "",
+      stock: json["stock"] ?? 0,
     );
   }
 }

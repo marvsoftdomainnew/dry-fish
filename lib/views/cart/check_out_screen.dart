@@ -284,9 +284,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     final prefs = await SharedPreferencesService.getInstance();
                     final latitude = prefs.getDouble(AppKeys.latitude);
                     final longitude = prefs.getDouble(AppKeys.longitude);
-
-                    final firstItem = cartController.cartItems.first;
-
                     final request = PlaceOrderRequest(
                       latitude: latitude,
                       longitude: longitude,
