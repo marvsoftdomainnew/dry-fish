@@ -13,6 +13,7 @@ class ApiConstants {
   static String reducequantityurl = "$baseUrl/user/reduceqty";
   static String increasequantityurl = "$baseUrl/user/increaseqty";
   static String orderListUrl = "$baseUrl/user/orders";
+  static String orderDetailUrl = "$baseUrl/user/orders";
   static String cancelOrderurl = "$baseUrl/user/cancelorder";
 
   static String addnewaddressurl = "$baseUrl/user/addaddress";

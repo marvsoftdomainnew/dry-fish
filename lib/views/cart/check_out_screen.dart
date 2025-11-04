@@ -28,6 +28,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartItemController cartController = Get.put(CartItemController());
   final GetAddressController getAddressController = Get.put(GetAddressController());
 
+  final TextEditingController instructionsController = TextEditingController(); // 👈 Added
+
   AddressModel? selectedAddress;
 
   @override
@@ -65,9 +67,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
 
       /// 👇 Body + FloatingCartBarWidget combined
-      body: Stack(
+      body: Stack( 
         children: [
-          /// 🧾 Main checkout UI (no change)
+          /// 🧾 Main checkout UI
           Obx(() {
             if (cartController.isLoading.value) {
               return const Center(child: CircularProgressIndicator());
@@ -99,7 +101,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 1.h),
-                  // Address Section
+
+                  // 🏠 Address Section
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
                     decoration: BoxDecoration(
@@ -157,14 +160,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                     ),
                   ),
+
                   SizedBox(height: 2.h),
 
-                  // Cart Items
+                  // 🧾 Order Summary
                   Text(
                     "Order Summary",
                     style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 1.h),
+
                   Expanded(
                     child: ListView.separated(
                       itemCount: items.length,
@@ -245,9 +250,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
 
                   SizedBox(height: 2.h),
+
+                  // ✍️ Delivery Instructions
+                  Text(
+                    "Delivery Instructions",
+                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 1.h),
+                  TextField(
+                    controller: instructionsController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText:
+                          "e.g., Please deliver between 5–6 PM or call before delivery",
+                          hintStyle: TextStyle(fontSize: 13.sp, color: AppColors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      contentPadding: EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  SizedBox(height: 2.h),
+
+                  // 💰 Price Summary
                   Container(
                     padding: EdgeInsets.all(3.w),
-                    margin: EdgeInsets.only(top: 1.h, bottom: 16.h), // leave space for bottom bar
+                    margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.white,
@@ -271,7 +304,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             );
           }),
 
-          /// 🛒 Floating Cart Bar at bottom (replaces bottomNavigationBar)
+          /// 🛒 Floating Cart Bar
           Positioned(
             left: 0,
             right: 0,
@@ -292,6 +325,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   address: selectedAddressId,
                   latitude: latitude,
                   longitude: longitude,
+                  instructions: instructionsController.text, // 👈 Added
                 );
 
                 await orderController.placeOrderCont(request);
@@ -327,4 +361,3 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 }
-

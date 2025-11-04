@@ -69,8 +69,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
             return InkWell(
               onTap: () {
-                Get.to(() => OrderDetailScreen(order: order));
-              },
+Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
@@ -101,8 +100,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Get.to(() => OrderDetailScreen(order: order));
-                                    },
+Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.all(2),
                                       child: Icon(

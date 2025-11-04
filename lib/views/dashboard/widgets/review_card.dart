@@ -24,7 +24,7 @@ class ReviewCard extends StatelessWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(w * 0.04),
+            padding: EdgeInsets.all(w * 0.04),         
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.4),
               borderRadius: BorderRadius.circular(16),

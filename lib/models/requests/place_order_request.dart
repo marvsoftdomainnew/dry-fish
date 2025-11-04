@@ -2,11 +2,13 @@ class PlaceOrderRequest {
   final int? address;
   final double? latitude;
   final double? longitude;
+  final String? instructions;
 
   PlaceOrderRequest({
     this.address,
     this.latitude,
     this.longitude,
+    this.instructions,
   });
 
   factory PlaceOrderRequest.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class PlaceOrderRequest {
       'address': address,
       'lattitude': latitude,
       'longitude': longitude,
+      'instructions': instructions, 
     };
   }
 }
