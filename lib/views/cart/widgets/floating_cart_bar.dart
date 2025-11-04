@@ -8,6 +8,7 @@ class FloatingCartBarWidget extends StatelessWidget {
   final RxDouble totalPrice;
   final String buttonText;
   final VoidCallback onTap;
+  final bool isLoading; // 👈 Added
 
   const FloatingCartBarWidget({
     super.key,
@@ -15,6 +16,7 @@ class FloatingCartBarWidget extends StatelessWidget {
     required this.totalPrice,
     required this.buttonText,
     required this.onTap,
+    this.isLoading = false, // 👈 Default false
   });
 
   @override
@@ -33,12 +35,13 @@ class FloatingCartBarWidget extends StatelessWidget {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: InkWell(
-            onTap: onTap,
+            onTap: isLoading ? null : onTap, // 👈 Disable tap during loading
             borderRadius: BorderRadius.circular(12),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.successGreen,
+                color: isLoading ? AppColors.successGreen : AppColors.successGreen, // 👈 Dim color while loading
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -74,8 +77,17 @@ class FloatingCartBarWidget extends StatelessWidget {
                     ],
                   ),
 
-                  /// Right: Button
-                  Row(
+                  /// Right: Button / Loader
+                  isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Row(
                     children: [
                       Text(
                         buttonText,
@@ -86,7 +98,8 @@ class FloatingCartBarWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                      const Icon(Icons.arrow_forward,
+                          color: Colors.white, size: 18),
                     ],
                   ),
                 ],
@@ -98,4 +111,3 @@ class FloatingCartBarWidget extends StatelessWidget {
     });
   }
 }
-

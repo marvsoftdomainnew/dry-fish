@@ -303,35 +303,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           }),
-
-          /// 🛒 Floating Cart Bar
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: FloatingCartBarWidget(
-              totalItems: totalItems.obs,
-              totalPrice: totalAmount.obs,
-              buttonText: "Place Order",
-              onTap: () async {
-                if (cartController.cartItems.isEmpty) return;
+            child: Obx(() {
+              return FloatingCartBarWidget(
+                totalItems: totalItems.obs,
+                totalPrice: totalAmount.obs,
+                buttonText: orderController.isLoading.value ? "Placing Order..." : "Place Order",
+                isLoading: orderController.isLoading.value,
+                onTap: () async {
+                  if (orderController.isLoading.value) return;
+                  if (cartController.cartItems.isEmpty) return;
 
-                final prefs = await SharedPreferencesService.getInstance();
-                final latitude = prefs.getDouble(AppKeys.latitude);
-                final longitude = prefs.getDouble(AppKeys.longitude);
-                final selectedAddressId = getAddressController.selectedAddressId.value;
+                  final prefs = await SharedPreferencesService.getInstance();
+                  final latitude = prefs.getDouble(AppKeys.latitude);
+                  final longitude = prefs.getDouble(AppKeys.longitude);
+                  final selectedAddressId = getAddressController.selectedAddressId.value;
 
-                final request = PlaceOrderRequest(
-                  address: selectedAddressId,
-                  latitude: latitude,
-                  longitude: longitude,
-                  instructions: instructionsController.text, // 👈 Added
-                );
+                  final request = PlaceOrderRequest(
+                    address: selectedAddressId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    instructions: instructionsController.text,
+                  );
 
-                await orderController.placeOrderCont(request);
-              },
-            ),
+                  await orderController.placeOrderCont(request);
+                },
+              );
+            }),
           ),
+
         ],
       ),
     );

@@ -299,10 +299,10 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
             maxLength: maxLength,
             onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
             decoration: InputDecoration(
-              isDense: true, // reduces height
-              visualDensity: VisualDensity(
-                vertical: -1,
-              ), // make it even more compact
+              isDense: true,
+              // reduces height
+              visualDensity: VisualDensity(vertical: -1),
+              // make it even more compact
               hintText: hint,
               counterText: maxLength != null ? "" : null,
               hintStyle: TextStyle(
@@ -381,7 +381,8 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
                   decoration: InputDecoration(
                     hintText: "9760203435",
                     counterText: "",
-                    isDense: true, // reduces height
+                    isDense: true,
+                    // reduces height
                     visualDensity: VisualDensity(vertical: -1),
                     hintStyle: TextStyle(
                       fontSize: width * 0.035,
@@ -470,8 +471,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
       await _addressController.addNewAddress(request);
 
       if (_addressController.addNewAddressResponse?.status == true) {
-        controller.fetchAddresses();
-        Get.until((route) => Get.currentRoute == AppRoutes.savedaddresses);
+        Navigator.pop(context);
       }
     }
   }

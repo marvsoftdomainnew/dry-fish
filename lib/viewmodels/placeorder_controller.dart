@@ -15,7 +15,7 @@ class PlaceOrderController extends GetxController {
     try {
       final response = await _repository.placeOrder(request);
 
-      if (response.status?.toLowerCase() == "success") {
+      if (response.status == "success") {
         order.value = response.order;
         Get.offAllNamed(
           AppRoutes.orderConfirmer,
