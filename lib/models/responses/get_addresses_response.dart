@@ -1,23 +1,31 @@
-class SavedAddressResponse {
+class GetAddressesResponse {
   final bool status;
   final String message;
   final List<AddressModel> addresses;
 
-  SavedAddressResponse({
+  GetAddressesResponse({
     required this.status,
     required this.message,
     required this.addresses,
   });
 
-  factory SavedAddressResponse.fromJson(Map<String, dynamic> json) {
-    return SavedAddressResponse(
+  factory GetAddressesResponse.fromJson(Map<String, dynamic> json) {
+    return GetAddressesResponse(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
       addresses: (json['addresses'] as List<dynamic>?)
-              ?.map((e) => AddressModel.fromJson(e))
-              .toList() ??
+          ?.map((e) => AddressModel.fromJson(e))
+          .toList() ??
           [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'addresses': addresses.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -37,6 +45,8 @@ class AddressModel {
   final String locality;
   final String addressType;
   final bool isSelected;
+  final String createdAt;
+  final String updatedAt;
 
   AddressModel({
     required this.id,
@@ -54,6 +64,8 @@ class AddressModel {
     required this.locality,
     required this.addressType,
     required this.isSelected,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
@@ -72,7 +84,31 @@ class AddressModel {
       landmark: json['landmark'] ?? '',
       locality: json['locality'] ?? '',
       addressType: json['address_type'] ?? '',
-      isSelected: json['is_selected'] == 1,
+      isSelected: (json['is_selected'] ?? 0) == 1,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'name': name,
+      'phone': phone,
+      'flat': flat,
+      'street': street,
+      'building': building,
+      'country': country,
+      'city': city,
+      'state': state,
+      'zip': zip,
+      'landmark': landmark,
+      'locality': locality,
+      'address_type': addressType,
+      'is_selected': isSelected ? 1 : 0,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
   }
 }

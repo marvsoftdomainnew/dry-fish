@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 import 'package:collection/collection.dart'; // <-- for firstWhereOrNull
 
-import '../models/responses/saved_addresses_response.dart';
-import '../repositories/address_list_respository.dart';
+import '../models/responses/get_addresses_response.dart';
+import '../repositories/get_addresses_repository.dart';
 
-class SavedAddressController extends GetxController {
-  final AddressListRespository _repository = AddressListRespository();
+class GetAddressController extends GetxController {
+
+  final GetAddressesRepository _repository = GetAddressesRepository();
 
   var isLoading = false.obs;
   var addresses = <AddressModel>[].obs;
@@ -23,7 +24,7 @@ class SavedAddressController extends GetxController {
     try {
       isLoading.value = true;
 
-      final response = await _repository.getaddresslist();
+      final response = await _repository.getAddressList();
 
       if (response.status) {
         addresses.assignAll(response.addresses);

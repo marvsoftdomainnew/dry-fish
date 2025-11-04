@@ -1,14 +1,14 @@
-class OrderListResponse {
+class OrderHistoryResponse {
   final String status;
   final List<Order> orders;
 
-  OrderListResponse({
+  OrderHistoryResponse({
     required this.status,
     required this.orders,
   });
 
-  factory OrderListResponse.fromJson(Map<String, dynamic> json) {
-    return OrderListResponse(
+  factory OrderHistoryResponse.fromJson(Map<String, dynamic> json) {
+    return OrderHistoryResponse(
       status: json["status"] ?? "",
       orders: json["orders"] != null
           ? List<Order>.from(json["orders"].map((x) => Order.fromJson(x)))
@@ -48,8 +48,7 @@ class Order {
       orderStatus: json["order_status"] ?? "",
       createdAt: json["created_at"] ?? "",
       orderItems: json["order_items"] != null
-          ? List<OrderItem>.from(
-              json["order_items"].map((x) => OrderItem.fromJson(x)))
+          ? List<OrderItem>.from(json["order_items"].map((x) => OrderItem.fromJson(x)))
           : [],
     );
   }
@@ -88,8 +87,7 @@ class OrderItem {
       cuttingType: json["cutting_type"],
       weight: json["weight"]?.toString(),
       status: json["status"],
-      product:
-          json["product"] != null ? Product.fromJson(json["product"]) : null,
+      product: json["product"] != null ? Product.fromJson(json["product"]) : null,
     );
   }
 }

@@ -30,10 +30,9 @@ class CartItemController extends GetxController {
       final response = await _repo.fetchcartItems();
 
       if (response.success == true) {
-        cartItems.assignAll(response.cart!);
+        cartItems.assignAll(response.cart);
       } else {
         cartItems.clear();
-        print("⚠️ API says cart is empty or null");
       }
 
       updateTotals();

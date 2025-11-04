@@ -3,21 +3,21 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
-import '../../viewmodels/order_list_controller.dart';
+import '../../viewmodels/order_history_controller.dart';
 import '../../widgets/custom_text_app_bar.dart';
 import 'order_detail_screen.dart';
 
-class OrderScreen extends StatefulWidget {
+class OrderHistoryScreen extends StatefulWidget {
   final bool showAppBar;
 
-  const OrderScreen({super.key, this.showAppBar = true});
+  const OrderHistoryScreen({super.key, this.showAppBar = true});
 
   @override
-  State<OrderScreen> createState() => _OrderScreenState();
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> {
-  final orderListController = Get.put(OrderListController());
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  final orderListController = Get.put(OrderHistoryController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +25,21 @@ class _OrderScreenState extends State<OrderScreen> {
       backgroundColor: AppColors.bgColor,
       appBar: widget.showAppBar
           ? AppBar(
-              backgroundColor: AppColors.extraLightestPrimary,
-              elevation: 1,
-              centerTitle: true,
-              title: const Text(
-                "Order History",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
-              ),
-            )
+        backgroundColor: AppColors.extraLightestPrimary,
+        elevation: 1,
+        centerTitle: true,
+        title: const Text(
+          "Order History",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      )
           : const CustomTextAppBar(title: "Orders"),
 
       body: Obx(() {
@@ -69,8 +69,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
             return InkWell(
               onTap: () {
-                  Get.to(() => OrderDetailScreen(orderId: order.id.toString()));
-              },
+Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
@@ -101,12 +100,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Get.to(
-                                        () => OrderDetailScreen(
-                                          orderId: order.id.toString(),
-                                        ),
-                                      );
-                                    },
+Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.all(2),
                                       child: Icon(
@@ -177,8 +171,8 @@ class _OrderScreenState extends State<OrderScreen> {
 
                           final isLast =
                               i ==
-                              order.orderItems.length -
-                                  1; // ✅ to avoid divider after last item
+                                  order.orderItems.length -
+                                      1; // ✅ to avoid divider after last item
 
                           return Column(
                             children: [
@@ -190,7 +184,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                 child: IntrinsicHeight(
                                   child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       /// IMAGE LEFT
                                       ClipRRect(
@@ -208,9 +202,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             /// NAME
                                             Text(
@@ -234,10 +228,10 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 children: [
                                                   TextSpan(
                                                     text:
-                                                        "${item.weight ?? '--'} KG",
+                                                    "${item.weight ?? '--'} KG",
                                                     style: TextStyle(
                                                       fontWeight:
-                                                          FontWeight.w500,
+                                                      FontWeight.w500,
                                                     ),
                                                   ),
                                                   const TextSpan(
@@ -257,12 +251,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                        "Qty: ${item.quantity}",
+                                                    "Qty: ${item.quantity}",
                                                     style: TextStyle(
                                                       fontWeight: FontWeight
                                                           .w600, // ✅ Medium Bold
                                                       color:
-                                                          Colors.grey.shade700,
+                                                      Colors.grey.shade700,
                                                     ),
                                                   ),
                                                 ],
@@ -325,90 +319,3 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 }
-
-
-      // const SizedBox(height: 12),
-                    // Column(
-                    //   children: order.orderItems.map((item) {
-                    //     final image = item.product?.image ?? "";
-                    //     final imageUrl = image.isNotEmpty
-                    //         ? "${ApiConstants.imageBaseUrl}$image"
-                    //         : "assets/images/banner2.jpg";
-
-                    //     return Padding(
-                    //       padding: const EdgeInsets.only(bottom: 14),
-                    //       child: IntrinsicHeight(
-                    //         // ✅ यह magic line है
-                    //         child: Row(
-                    //           crossAxisAlignment: CrossAxisAlignment.start,
-                    //           children: [
-                    //             /// IMAGE LEFT SIDE
-                    //             ClipRRect(
-                    //               borderRadius: BorderRadius.circular(6),
-                    //               child: Image.network(
-                    //                 imageUrl,
-                    //                 width: 24.w,
-                    //                 height: 7.h,
-                    //                 fit: BoxFit.cover,
-                    //               ),
-                    //             ),
-                    //             SizedBox(width: 4.w),
-
-                    //             Expanded(
-                    //               child: Column(
-                    //                 crossAxisAlignment:
-                    //                     CrossAxisAlignment.start,
-                    //                 mainAxisAlignment: MainAxisAlignment
-                    //                     .spaceBetween, // ✅ Name top, Info bottom
-                    //                 children: [
-                    //                   /// PRODUCT NAME
-                    //                   Text(
-                    //                     item.product?.name ?? "Unknown Product",
-                    //                     maxLines: 2,
-                    //                     overflow: TextOverflow.ellipsis,
-                    //                     style: TextStyle(
-                    //                       fontSize: 14.sp,
-                    //                       fontWeight: FontWeight.w600,
-                    //                       color: Colors.black,
-                    //                     ),
-                    //                   ),
-                    //                   Text(
-                    //                     "${item.weight ?? '--'}gms   |   ₹${item.price}   |   Qty: ${item.quantity}",
-                    //                     style: TextStyle(
-                    //                       color: Colors.grey,
-                    //                       fontSize: 12.sp,
-                    //                       fontWeight: FontWeight.w500,
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     );
-                    //   }).toList(),
-                    // ),
-                  
-  // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.end,
-                    //   children: [
-                    //     ElevatedButton(
-                    //       style: ElevatedButton.styleFrom(
-                    //         backgroundColor: AppColors.primary,
-                    //         shape: RoundedRectangleBorder(
-                    //           borderRadius: BorderRadius.circular(10),
-                    //         ),
-                    //         minimumSize: Size(3.w, 4.h),
-                    //       ),
-                    //       onPressed: () {},
-                    //       child: Text(
-                    //         "Repeat",
-                    //         style: TextStyle(
-                    //           fontSize: 14.sp,
-                    //           color: AppColors.white,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),

@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../models/requests/add_new_address_request.dart';
 import '../../models/requests/update_address_request.dart';
-import '../../models/responses/saved_addresses_response.dart';
+import '../../models/responses/get_addresses_response.dart';
 import '../../roots/routes.dart';
 import '../../viewmodels/add_new_addresss_controller.dart';
-import '../../viewmodels/saved_address_controller.dart';
+import '../../viewmodels/get_address_controller.dart';
 import '../../viewmodels/update_address_controller.dart';
 import '../../widgets/custom_button.dart';
 
@@ -36,7 +36,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final UpdateAddressController _updateController = Get.put(
     UpdateAddressController(),
   );
-  final controller = Get.put(SavedAddressController());
+  final controller = Get.put(GetAddressController());
 
   String selectedTag = "HOME";
   AddressModel? editModel; // <-- yaha model store hoga
@@ -474,7 +474,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
         landmark: _landmarkController.text.trim(),
         locality: _localityController.text.trim(),
         addressType: selectedTag.toLowerCase(),
-        isSelected: true,
+        isSelected: false,
       );
 
       await _addressController.addNewAddress(request);

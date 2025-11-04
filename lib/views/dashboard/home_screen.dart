@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildSectionTitle("Customer Reviews", "What our customers say about us"),
                 SizedBox(height: screenHeight * 0.01),
                 SizedBox(
-                  height: screenHeight * 0.22,
+                  height: screenHeight * 0.20,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.only(left: screenWidth * 0.03),

@@ -16,9 +16,9 @@ class ApiConstants {
   static String orderDetailUrl = "$baseUrl/user/orders";
   static String cancelOrderurl = "$baseUrl/user/cancelorder";
   static String addnewaddressurl = "$baseUrl/user/addaddress";
-  static String savedAddressesUrl = "$baseUrl/user/addresses";
   static String deleteaddressurl = "$baseUrl/user/deleteaddress";
   static String updateaddressUrl = "$baseUrl/user/editaddress";
+  static String getAddressesUrl = "$baseUrl/user/addresses";
 
   static String productByCategoryUrl(int categoryId) =>
       "$baseUrl/products/categories/$categoryId";

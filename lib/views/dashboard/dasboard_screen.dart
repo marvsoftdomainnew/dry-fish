@@ -18,6 +18,7 @@ import '../../constants/app_keys.dart';
 import '../../utils/logger.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
+import '../../viewmodels/get_address_controller.dart';
 import 'home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -30,6 +31,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final DashboardController _dashboardController = Get.put(DashboardController());
   final CartItemController _cartItemController = Get.put(CartItemController());
+  final GetAddressController getAddressController = Get.put(GetAddressController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final RxBool isBottomSheetVisible = false.obs;
@@ -51,7 +53,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _showLocationBottomSheet();
+      await getAddressController.fetchAddresses();
+      // 🔹 If user already has saved addresses → skip location sheet
+      if (getAddressController.addresses.isNotEmpty) {
+        final selected = getAddressController.selectedAddress;
+        if (selected != null) {
+          setState(() {
+            currentAddress =
+            "${selected.flat}, ${selected.street}, ${selected.locality}, ${selected.city}";
+            street = selected.street;
+          });
+        }
+      } else {
+        // 🔹 No address found → ask location
+        _showLocationBottomSheet();
+      }
+
       _cartItemController.fetchItems();
     });
   }
@@ -92,6 +109,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SnackBar(content: Text("Location permission is required")),
       );
     }
+    // if (locationStatus.isDenied || locationStatus.isPermanentlyDenied) {
+    //   // 🔹 If user denies → open map view for manual select
+    //   _openMapView();
+    //   return;
+    // }
 
     var notificationStatus = await Permission.notification.request();
     if (notificationStatus.isDenied) {
@@ -100,6 +122,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
   }
+  // void _openMapView() {
+  //   Navigator.pop(context); // close bottom sheet if open
+  //
+  //   // 🔹 Navigate to your map view page (replace with your actual screen)
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => MapViewScreen()),
+  //   );
+  // }
   /// 🔹 Get current location & convert to address
   Future<void> _getCurrentLocation() async {
     try {
@@ -246,3 +277,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+

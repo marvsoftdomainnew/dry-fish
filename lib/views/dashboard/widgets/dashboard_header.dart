@@ -48,6 +48,7 @@ class DashboardHeader extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: AppColors.black,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

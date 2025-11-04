@@ -56,7 +56,7 @@ class _CartScreenState extends State<CartScreen> {
               elevation: 1,
               centerTitle: true,
               title: const Text(
-                "My Cart",
+                "Cart",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w500,

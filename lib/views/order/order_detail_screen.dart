@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
-import '../../viewmodels/order_details_controller.dart';
+import '../../viewmodels/order_detaails_controller.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final String orderId;

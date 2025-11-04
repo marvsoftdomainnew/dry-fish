@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import '../models/responses/order_list_response.dart';
+import '../models/responses/order_history_response.dart';
 import '../repositories/order_list_respository.dart';
 
-class OrderListController extends GetxController {
+class OrderHistoryController extends GetxController {
   final OrderListRespository repository = OrderListRespository();
 
   final isLoading = false.obs;

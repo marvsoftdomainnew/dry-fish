@@ -54,14 +54,8 @@ class ReduceQuantityController extends GetxController {
       if (response.status) {
         isSuccess.value = true;
         message.value = response.message;
-
-        /// ✅ Success Snackbar from Controller
-        SnackbarUtil.showSuccess("Updated", message.value);
       } else {
         message.value = response.message;
-
-        /// ❌ Error Snackbar from Controller
-        SnackbarUtil.showError("Failed", message.value);
       }
     } catch (e) {
       message.value = "Error: ${e.toString()}";

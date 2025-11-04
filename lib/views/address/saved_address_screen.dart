@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
-import '../../models/responses/saved_addresses_response.dart';
+import '../../models/responses/get_addresses_response.dart';
 import '../../roots/routes.dart';
-import '../../viewmodels/saved_address_controller.dart';
-import '../../viewmodels/delete_address_controller.dart'; 
+import '../../viewmodels/get_address_controller.dart';
+import '../../viewmodels/delete_address_controller.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final SavedAddressController controller = Get.put(SavedAddressController());
+    final GetAddressController controller = Get.put(GetAddressController());
     final DeleteAddressController deleteController = Get.put(DeleteAddressController());
 
     return Scaffold(
@@ -91,7 +91,7 @@ class SavedAddressesScreen extends StatelessWidget {
     AddressModel model,
     int? selectedId,
     DeleteAddressController deleteController,
-    SavedAddressController savedController,
+    GetAddressController savedController,
   ) {
     final bool isSelected = selectedId == model.id;
     final isDeleting = deleteController.deletingId.value == model.id.toString();

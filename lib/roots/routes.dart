@@ -28,8 +28,7 @@ class AppRoutes {
   static const newAddress = '/newAddress';
   static const search = '/search';
   static const Checkout = '/Checkout';
-  static const order = '/order';
-  static const orderDetails = '/orderDetails';
+  static const orderHistory = '/orderHistory';
   static const contact = '/contact';
   static const productScreen = '/productScreen';
   static const productDetail = '/productDetail';
@@ -63,8 +62,7 @@ class AppRoutes {
       _buildPage(name: newAddress, page: () => NewAddressScreen()),
       _buildPage(name: search, page: () => SearchScreen()),
       _buildPage(name: Checkout, page: () => CheckoutScreen()),
-      _buildPage(name: order, page: () => OrderScreen()),
-      _buildPage(name: orderDetails, page: () => OrderScreen()),
+      _buildPage(name: orderHistory, page: () => OrderHistoryScreen()),
       _buildPage(name: contact, page: () => ContactUsScreen()),
       _buildPage(name: productScreen, page: () => ProductListScreen()),
       _buildPage(name: productDetail, page: () => ProductDetailScreen()),

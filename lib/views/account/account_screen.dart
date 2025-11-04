@@ -381,7 +381,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 icon: Icons.shopping_cart_outlined,
                 title: "Orders",
                 subtitle: "Check your order status",
-                onTap: () => Get.toNamed(AppRoutes.order),
+                onTap: () => Get.toNamed(AppRoutes.orderHistory),
               ),
               _buildMenuItem(
                 icon: Icons.card_giftcard,
@@ -399,7 +399,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 title: "Saved Addresses",
                 subtitle: "Manage your delivery addresses",
                 onTap: () =>
-                    Get.toNamed(AppRoutes.savedaddresses), // << route yaha aapka hoga
+                    Get.toNamed(AppRoutes.savedaddresses),
               ),
 
               _buildMenuItem(
