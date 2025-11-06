@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../Constants/app_colors.dart';
-import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/api_constants.dart';
 import '../../roots/routes.dart';
 import '../../viewmodels/category_controller.dart';
 import '../../viewmodels/products_by_category_controller.dart';
-import 'product_detail_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({Key? key}) : super(key: key);

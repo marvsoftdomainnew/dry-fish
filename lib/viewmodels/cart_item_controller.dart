@@ -48,12 +48,12 @@ class CartItemController extends GetxController {
   void updateTotals() {
     totalItems.value = cartItems.fold<int>(
       0,
-          (sum, item) => sum + (item.quantity ?? 0),
+          (sum, item) => sum + (item.quantity),
     );
 
     totalPrice.value = cartItems.fold<double>(
       0.0,
-          (sum, item) => sum + (item.total ?? 0.0),
+          (sum, item) => sum + (item.total),
     );
   }
 }

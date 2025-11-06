@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sizer/sizer.dart';
 import '../../../Constants/app_colors.dart';
 
 class FloatingCartBarWidget extends StatelessWidget {
