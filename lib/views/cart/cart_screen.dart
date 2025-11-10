@@ -155,7 +155,15 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            "${item.product.weight} kg  |  Qty: ${item.quantity}",
+                                            "${item.weight} KG  |  Qty: ${item.quantity}",
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            "Cutting: ${item.cuttingType}",
                                             style: TextStyle(
                                               fontSize: 14.sp,
                                               color: Colors.grey[600],
@@ -236,7 +244,7 @@ class _CartScreenState extends State<CartScreen> {
                                           onPressed: isDecLoading
                                               ? null
                                               : () async {
-                                                  if (item.quantity > 1) {
+                                                  if (item.quantity > 0) {
                                                     decreaseLoading[id] = true;
 
                                                     final oldQty =
@@ -248,6 +256,13 @@ class _CartScreenState extends State<CartScreen> {
                                                               .toString(),
                                                         ) ??
                                                         0.0;
+                                                    item.total =
+                                                        price * item.quantity;
+                                                    if (item.quantity == 0) {
+                                                      cartitemController
+                                                          .cartItems
+                                                          .removeAt(index);
+                                                    }
                                                     item.total =
                                                         price * item.quantity;
 

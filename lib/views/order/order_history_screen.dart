@@ -25,21 +25,21 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       backgroundColor: AppColors.bgColor,
       appBar: widget.showAppBar
           ? AppBar(
-        backgroundColor: AppColors.extraLightestPrimary,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          "Order History",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      )
+              backgroundColor: AppColors.extraLightestPrimary,
+              elevation: 1,
+              centerTitle: true,
+              title: const Text(
+                "Order History",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+            )
           : const CustomTextAppBar(title: "Orders"),
 
       body: Obx(() {
@@ -56,7 +56,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           );
         }
 
-        final orders = orderListController.orders;
+        final orders = orderListController.orders.reversed.toList();
 
         return ListView.builder(
           padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12.h),
@@ -69,7 +69,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
             return InkWell(
               onTap: () {
-Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
+                Get.to(() => OrderDetailScreen(orderId: order.id.toString()));
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
@@ -100,7 +101,12 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
                                   ),
                                   InkWell(
                                     onTap: () {
-Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                                    },
+                                      Get.to(
+                                        () => OrderDetailScreen(
+                                          orderId: order.id.toString(),
+                                        ),
+                                      );
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.all(2),
                                       child: Icon(
@@ -171,8 +177,8 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
 
                           final isLast =
                               i ==
-                                  order.orderItems.length -
-                                      1; // ✅ to avoid divider after last item
+                              order.orderItems.length -
+                                  1; // ✅ to avoid divider after last item
 
                           return Column(
                             children: [
@@ -184,7 +190,7 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                 child: IntrinsicHeight(
                                   child: Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       /// IMAGE LEFT
                                       ClipRRect(
@@ -202,9 +208,9 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             /// NAME
                                             Text(
@@ -228,10 +234,10 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                                 children: [
                                                   TextSpan(
                                                     text:
-                                                    "${item.weight ?? '--'} KG",
+                                                        "${item.weight ?? '--'} KG",
                                                     style: TextStyle(
                                                       fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                   const TextSpan(
@@ -251,12 +257,12 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                    "Qty: ${item.quantity}",
+                                                        "Qty: ${item.quantity}",
                                                     style: TextStyle(
                                                       fontWeight: FontWeight
                                                           .w600, // ✅ Medium Bold
                                                       color:
-                                                      Colors.grey.shade700,
+                                                          Colors.grey.shade700,
                                                     ),
                                                   ),
                                                 ],

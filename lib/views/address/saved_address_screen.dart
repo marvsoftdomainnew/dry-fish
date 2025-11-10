@@ -13,7 +13,9 @@ class SavedAddressesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GetAddressController controller = Get.put(GetAddressController());
-    final DeleteAddressController deleteController = Get.put(DeleteAddressController());
+    final DeleteAddressController deleteController = Get.put(
+      DeleteAddressController(),
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -153,10 +155,11 @@ class SavedAddressesScreen extends StatelessWidget {
                 : Icon(Icons.more_vert, size: 18.sp, color: Colors.grey[600]),
             onSelected: (value) async {
               if (value == "edit") {
-                final result = await Get.toNamed(
+                final result = Get.toNamed(
                   AppRoutes.newAddress,
-                  arguments: model,
+                  arguments: {'model': model, 'currentAddress': null},
                 );
+
                 if (result == true) {
                   savedController.fetchAddresses();
                 }

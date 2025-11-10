@@ -10,6 +10,7 @@ import '../../constants/app_keys.dart';
 import '../../models/requests/place_order_request.dart';
 import '../../models/responses/get_addresses_response.dart';
 import '../../services/sharedpreferences_service.dart';
+import '../../utils/snackbar_util.dart';
 import '../../viewmodels/get_address_controller.dart';
 import '../../viewmodels/placeorder_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
@@ -30,11 +31,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final GetAddressController getAddressController = Get.put(
     GetAddressController(),
   );
-
   final TextEditingController instructionsController =
       TextEditingController(); // 👈 Added
 
   AddressModel? selectedAddress;
+  String? currentAddressprefs;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cartController.fetchItems();
       getAddressController.fetchAddresses();
+      // loadCurrentAddress();
     });
   }
 
@@ -93,7 +95,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
             final addressText = hasAddress && selectedAddress != null
                 ? "${selectedAddress.name}, ${selectedAddress.flat}, ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.zip}"
-                : "Add delivery address";
+                : (currentAddressprefs != null &&
+                          currentAddressprefs!.isNotEmpty
+                      ? currentAddressprefs!
+                      : "Add delivery address");
+
+            // final addressText = hasAddress && selectedAddress != null
+            //     ? "${selectedAddress.name}, ${selectedAddress.flat}, ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.zip}"
+            //     : "Add delivery address";
 
             final buttonText = hasAddress ? "Change" : "Add";
 
@@ -154,7 +163,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 getAddressController.selectAddress(selected.id);
                               }
                             } else {
-                              await Get.toNamed(AppRoutes.newAddress);
+                              await Get.toNamed(
+                                AppRoutes.newAddress,
+                                arguments: {
+                                  'model': null,
+                                  'currentAddress': currentAddressprefs,
+                                },
+                              );
+
+                              // await Get.toNamed(
+                              //   AppRoutes.newAddress,
+                              //   arguments: {
+                              //     'currentAddress': currentAddressprefs,
+                              //   },
+                              // );
+
+                              // await Get.toNamed(
+                              //   AppRoutes.newAddress,
+                              //   arguments: model,
+                              // );
                               getAddressController.fetchAddresses();
                             }
                           },
@@ -202,8 +229,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
                                   imageUrl,
-                                  width: 22.w,
-                                  height: 8.h,
+                                  width: 25.w,
+                                  height: 9.h,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) =>
                                       const Icon(Icons.image, size: 40),
@@ -220,14 +247,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(height: 0.5.h),
+                                    const SizedBox(height: 6),
                                     Text(
-                                      "${item.product.weight}",
+                                      "${item.weight} KG  |  Qty: ${item.quantity}",
                                       style: TextStyle(
-                                        fontSize: 12.sp,
+                                        fontSize: 14.sp,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      "Cutting: ${item.cuttingType}",
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
                                         color: Colors.grey[600],
                                       ),
                                     ),
@@ -338,7 +373,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onTap: () async {
                   if (orderController.isLoading.value) return;
                   if (cartController.cartItems.isEmpty) return;
-
+                  final selectedAddressId =
+                      getAddressController.selectedAddressId.value;
+                  final hasAddress = getAddressController.addresses.isNotEmpty;
+                  if (!hasAddress || selectedAddressId == 0) {
+                    SnackbarUtil.showError(
+                      "No Address Selected",
+                      "Please add or select a delivery address before placing the order.",
+                    );
+                    return;
+                  }
                   // Show popup dialog first 👇
                   bool? isConfirmed = await showDialog<bool>(
                     context: context,
@@ -466,7 +510,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 onPressed: isChecked
                                     ? () => Navigator.pop(context, true)
                                     : null,
-                                child: const Text("Confirm",  style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: const Text(
+                                  "Confirm",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ],
                           );

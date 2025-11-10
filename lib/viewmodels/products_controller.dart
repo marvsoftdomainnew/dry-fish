@@ -20,7 +20,7 @@ class ProductsController extends GetxController {
           productList.value = response.products!;
         } else {
           productList.clear();
-          SnackbarUtil.showError("Info", "No products found for this category.");
+          // SnackbarUtil.showError("Info", "No products found for this category.");
         }
       } else {
         SnackbarUtil.showError(

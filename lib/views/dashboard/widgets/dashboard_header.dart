@@ -42,9 +42,11 @@ class DashboardHeader extends StatelessWidget {
                     const Icon(Icons.location_on, color: AppColors.alertRed),
                     SizedBox(width: screenWidth * 0.01),
                     Text(
-                      street,
+                      street.length > 30
+                          ? '${street.substring(0, 30)}...'
+                          : street,
                       style: GoogleFonts.nunito(
-                        fontSize: screenWidth * 0.045,
+                        fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.w700,
                         color: AppColors.black,
                       ),

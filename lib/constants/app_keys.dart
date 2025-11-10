@@ -5,4 +5,5 @@ class AppKeys {
   static const String user = "user";
   static const String latitude = "latitude";
   static const String longitude = "longitude";
+  static const String currentAddress = "currentAddress";
 }

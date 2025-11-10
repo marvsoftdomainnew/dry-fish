@@ -20,7 +20,7 @@ class CartResponseModel {
   Map<String, dynamic> toJson() {
     return {
       'success': success,
-       'cart': cart.map((e) => e.toJson()).toList(),
+      'cart': cart.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -29,9 +29,11 @@ class CartItem {
   final int id;
   final int userId;
   final int productId;
-   int quantity;
+  int quantity;
   final double price;
-   double total;
+  final String cuttingType;
+  final String weight;
+  double total;
   final String status;
   final String createdAt;
   final String updatedAt;
@@ -43,6 +45,8 @@ class CartItem {
     required this.productId,
     required this.quantity,
     required this.price,
+    required this.cuttingType,
+    required this.weight,
     required this.total,
     required this.status,
     required this.createdAt,
@@ -57,6 +61,8 @@ class CartItem {
       productId: json['product_id'] ?? 0,
       quantity: json['quantity'] ?? 0,
       price: double.tryParse(json['price'].toString()) ?? 0.0,
+      cuttingType: json['cutting_type'] ?? '',
+      weight: json['weight']?.toString() ?? '',
       total: double.tryParse(json['total'].toString()) ?? 0.0,
       status: json['status'] ?? '',
       createdAt: json['created_at'] ?? '',
@@ -72,6 +78,8 @@ class CartItem {
       'product_id': productId,
       'quantity': quantity,
       'price': price,
+      'cutting_type': cuttingType,
+      'weight': weight,
       'total': total,
       'status': status,
       'created_at': createdAt,

@@ -15,6 +15,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/app_keys.dart';
+import '../../roots/routes.dart';
 import '../../utils/logger.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
@@ -29,9 +30,13 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardController _dashboardController = Get.put(DashboardController());
+  final DashboardController _dashboardController = Get.put(
+    DashboardController(),
+  );
   final CartItemController _cartItemController = Get.put(CartItemController());
-  final GetAddressController getAddressController = Get.put(GetAddressController());
+  final GetAddressController getAddressController = Get.put(
+    GetAddressController(),
+  );
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final RxBool isBottomSheetVisible = false.obs;
@@ -54,13 +59,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getAddressController.fetchAddresses();
-      // 🔹 If user already has saved addresses → skip location sheet
       if (getAddressController.addresses.isNotEmpty) {
         final selected = getAddressController.selectedAddress;
         if (selected != null) {
           setState(() {
             currentAddress =
-            "${selected.flat}, ${selected.street}, ${selected.locality}, ${selected.city}";
+                "${selected.flat}, ${selected.street}, ${selected.locality}, ${selected.city}";
             street = selected.street;
           });
         }
@@ -83,24 +87,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
       enableDrag: false,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => Obx(() => LocationBottomSheet(
-        isLoading: _isLoadingCurrentLocation.value,
-        onUseCurrentLocation: () async {
-          _isLoadingCurrentLocation.value = true;
-          await _requestPermissions();
-          await _getCurrentLocation();
-          _isLoadingCurrentLocation.value = false;
-          Navigator.pop(context);
-        },
-        onSelectManual: () {
-          Navigator.pop(context);
-          _requestPermissions();
-        },
-      )),
+      builder: (_) => Obx(
+        () => LocationBottomSheet(
+          isLoading: _isLoadingCurrentLocation.value,
+          onUseCurrentLocation: () async {
+            _isLoadingCurrentLocation.value = true;
+            await _requestPermissions();
+            await _getCurrentLocation();
+            _isLoadingCurrentLocation.value = false;
+            Navigator.pop(context);
+          },
+          onSelectManual: () {
+            Navigator.pop(context);
+            _requestPermissions();
+          },
+        ),
+      ),
     ).whenComplete(() {
       isBottomSheetVisible.value = false;
     });
   }
+
   /// 🔹 Request permissions
   Future<void> _requestPermissions() async {
     var locationStatus = await Permission.locationWhenInUse.request();
@@ -122,6 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
   }
+
   // void _openMapView() {
   //   Navigator.pop(context); // close bottom sheet if open
   //
@@ -154,11 +162,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final prefs = await SharedPreferencesService.getInstance();
       await prefs.setDouble(AppKeys.latitude, position.latitude);
       await prefs.setDouble(AppKeys.longitude, position.longitude);
-      appLog("✅ Saved to SharedPreferences: lat=${position.latitude}, long=${position.longitude}");
+      appLog(
+        "✅ Saved to SharedPreferences: lat=${position.latitude}, long=${position.longitude}",
+      );
 
-      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
+        // await prefs.setString(AppKeys.currentAddress, formattedAddress);
+        // await prefs.setString(AppKeys.street, streetAddress);
+
         // Log each address component separately
         appLog("🏠 Address Details ↓");
         appLog("Street: ${place.street}");
@@ -174,17 +190,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         appLog("SubThoroughfare: ${place.subThoroughfare}");
         setState(() {
           final streetAddress = "${place.street}";
-          final formattedAddress = "${place.subLocality}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
-
+          final formattedAddress =
+              "${place.subLocality}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+          prefs.setString(AppKeys.currentAddress, formattedAddress);
+          appLog("✅ Saved to SharedPreferences: ${formattedAddress}");
           setState(() {
             street = streetAddress;
-            currentAddress = formattedAddress;});
+            currentAddress = formattedAddress;
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Get.toNamed(
+              AppRoutes.newAddress,
+              arguments: {"currentAddress": formattedAddress},
+            );
+          });
         });
       }
     } catch (e) {
       setState(() => currentAddress = "Error getting location: $e");
     }
   }
+
   /// 🔹 Handle back press
   Future<bool> _onWillPop() async {
     if (_scaffoldKey.currentState?.isDrawerOpen == true) {
@@ -221,60 +247,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: AppColors.bgColor,
         body: Stack(
           children: [
-            Obx(() => Column(
-              children: [
-                if (_dashboardController.selectedIndex.value == 0)
-                  DashboardHeader(
-                    address: currentAddress,
-                    street: street,
-                    screenWidth: screenWidth,
-                    screenHeight: screenHeight,
-                    statusBarHeight: statusBarHeight,
+            Obx(
+              () => Column(
+                children: [
+                  if (_dashboardController.selectedIndex.value == 0)
+                    DashboardHeader(
+                      address: currentAddress,
+                      street: street,
+                      screenWidth: screenWidth,
+                      screenHeight: screenHeight,
+                      statusBarHeight: statusBarHeight,
+                    ),
+                  Expanded(
+                    child: _screens[_dashboardController.selectedIndex.value],
                   ),
-                Expanded(
-                  child: _screens[_dashboardController.selectedIndex.value],
-                ),
-              ],
-            )),
-            Obx(() => isBottomSheetVisible.value
-                ? BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(color: Colors.black.withOpacity(0.1)),
-            )
-                : const SizedBox.shrink()),
+                ],
+              ),
+            ),
+            Obx(
+              () => isBottomSheetVisible.value
+                  ? BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Container(color: Colors.black.withOpacity(0.1)),
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ],
         ),
-        bottomNavigationBar: Obx(() => BottomNavigationBar(
-          backgroundColor: AppColors.white,
-          currentIndex: _dashboardController.selectedIndex.value,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.darkGrey,
-          type: BottomNavigationBarType.fixed,
-          selectedFontSize: 14,
-          unselectedFontSize: 12,
-          iconSize: 24,
-          onTap: _dashboardController.selectedIndex,
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(LucideIcons.house),
-              label: "Home",
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(LucideIcons.search),
-              label: "Search",
-            ),
-            BottomNavigationBarItem(
-              icon: CartBadgeIcon(controller: _cartItemController),
-              label: "Cart",
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(LucideIcons.user),
-              label: "Account",
-            ),
-          ],
-        )),
+        bottomNavigationBar: Obx(
+          () => BottomNavigationBar(
+            backgroundColor: AppColors.white,
+            currentIndex: _dashboardController.selectedIndex.value,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.darkGrey,
+            type: BottomNavigationBarType.fixed,
+            selectedFontSize: 14,
+            unselectedFontSize: 12,
+            iconSize: 24,
+            onTap: _dashboardController.selectedIndex,
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(LucideIcons.house),
+                label: "Home",
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(LucideIcons.search),
+                label: "Search",
+              ),
+              BottomNavigationBarItem(
+                icon: CartBadgeIcon(controller: _cartItemController),
+                label: "Cart",
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(LucideIcons.user),
+                label: "Account",
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
-

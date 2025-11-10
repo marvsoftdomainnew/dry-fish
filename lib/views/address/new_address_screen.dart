@@ -39,15 +39,19 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final controller = Get.put(GetAddressController());
 
   String selectedTag = "HOME";
-  AddressModel? editModel; // <-- yaha model store hoga
+  AddressModel? editModel; 
   bool isEditMode = false;
 
   @override
   void initState() {
     super.initState();
 
-    editModel = Get.arguments as AddressModel?;
+    final args = Get.arguments ?? {};
+    editModel = args['model'] as AddressModel?;
+    final currentAddress = args['currentAddress'] as String?;
+
     if (editModel != null) {
+      // 🟢 EDIT EXISTING ADDRESS
       isEditMode = true;
 
       _nameController.text = editModel!.name;
@@ -60,6 +64,22 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
       _pincodeController.text = editModel!.zip;
       _localityController.text = editModel!.locality;
       selectedTag = editModel!.addressType.toUpperCase();
+    } else if (currentAddress != null && currentAddress.isNotEmpty) {
+      // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
+      final parts = currentAddress.split(',');
+
+      _nameController.text = " ";
+      _mobileController.text = " ";
+      _houseController.text = " ";
+      _buildingController.text = " ";
+      _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
+      _landmarkController.text = " ";
+      _localityController.text = parts.length > 0
+          ? parts[0].trim()
+          : "Building";
+      _blockController.text = " ";
+      _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
+      selectedTag = "HOME";
     }
   }
 

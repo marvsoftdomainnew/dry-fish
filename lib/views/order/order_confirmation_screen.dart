@@ -142,14 +142,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
                                 // ✅ Show response
                                 if (_cancelOrderController.isCancelled.value) {
-                                  Get.snackbar(
-                                    "Success",
-                                    _cancelOrderController.message.value,
-                                    backgroundColor: Colors.green,
-                                    colorText: Colors.white,
-                                  );
-                                  // 🔹 Button will automatically hide (because of Obx above)
-                                } else {
+                                                                 } else {
                                   Get.snackbar(
                                     "Failed",
                                     _cancelOrderController.message.value,
