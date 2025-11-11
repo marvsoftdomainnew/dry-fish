@@ -86,7 +86,7 @@ class OrderDetailScreen extends StatelessWidget {
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 6,
-                          offset: const Offset(0, 3),
+                          offset: const Offset(0, 3) ,
                         ),
                       ],
                     ),

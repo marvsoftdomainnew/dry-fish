@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dry_fish/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -196,7 +197,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             : const SizedBox.shrink(key: ValueKey("empty")),
       ),
       flexibleSpace: FlexibleSpaceBar(
-        background: _buildHeroImage(),
+        background: _buildHeroImage([imageUrl]),
       ),
       leading: Padding(
         padding: EdgeInsets.only(left: 4.w),
@@ -209,45 +210,97 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget _buildHeroImage() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Hero(
-          tag: imageUrl,
-          child: ClipRRect(
-            borderRadius:
-                const BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              errorWidget: (_, __, ___) =>
-                  Image.asset("assets/images/banner2.jpg", fit: BoxFit.cover),
+Widget _buildHeroImage(List<String> imageUrls) {
+  return CarouselSlider.builder(
+    itemCount: imageUrls.length,
+    itemBuilder: (context, index, realIdx) {
+      final imageUrl = imageUrls[index];
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Hero(
+            tag: imageUrl,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
+              ),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                placeholder: (_, __) =>
+                    const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                errorWidget: (_, __, ___) =>
+                    Image.asset("assets/images/banner2.jpg", fit: BoxFit.cover),
+              ),
             ),
           ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius:
-                const BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black.withOpacity(0.1)],
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.1)],
+              ),
             ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
+    },
+    options: CarouselOptions(
+      height: 250,
+      viewportFraction: 1,
+      autoPlay: true,
+      autoPlayInterval: const Duration(seconds: 3),
+      enlargeCenterPage: false,
+    ),
+  );
+}
+
+
+  // Widget _buildHeroImage() {
+  //   return Stack(
+  //     fit: StackFit.expand,
+  //     children: [
+  //       Hero(
+  //         tag: imageUrl,
+  //         child: ClipRRect(
+  //           borderRadius:
+  //               const BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
+  //           child: CachedNetworkImage(
+  //             imageUrl: imageUrl,
+  //             fit: BoxFit.cover,
+  //             placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+  //             errorWidget: (_, __, ___) =>
+  //                 Image.asset("assets/images/banner2.jpg", fit: BoxFit.cover),
+  //           ),
+  //         ),
+  //       ),
+  //       Container(
+  //         decoration: BoxDecoration(
+  //           borderRadius:
+  //               const BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
+  //           gradient: LinearGradient(
+  //             begin: Alignment.topCenter,
+  //             end: Alignment.bottomCenter,
+  //             colors: [Colors.transparent, Colors.black.withOpacity(0.1)],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildProductHeader() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(productName,
               style: TextStyle(
-                  fontSize: 21.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF1E293B),
                   height: 1.2)),
@@ -265,7 +318,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         children: [
           Text("Choose Your Cut",
               style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 17.sp, color: AppColors.black)),
+                  fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.black)),
           const SizedBox(height: 8),
           Text("Select the perfect cut for your cooking needs",
               style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey)),
@@ -357,7 +410,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       });
 }
 
-/// --- SMALL REUSABLE WIDGETS BELOW ---
 
 class _CutCard extends StatelessWidget {
   final Map<String, dynamic> cut;
