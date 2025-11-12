@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/app_colors.dart';
 import 'card_container.dart';
-import 'icon_box.dart';
+// import 'icon_box.dart';
 
 class InfoCards extends StatelessWidget {
   final double screenWidth;
@@ -42,21 +42,21 @@ class InfoCards extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 12),
-        CardContainer(
-          child: Row(
-            children: [
-              IconBox(),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  "123 Marine Street, Coastal City, India",
-                  style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // SizedBox(height: 12),
+        // CardContainer(
+        //   child: Row(
+        //     children: [
+        //       IconBox(),
+        //       SizedBox(width: 12),
+        //       Expanded(
+        //         child: Text(
+        //           "123 Marine Street, Coastal City, India",
+        //           style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

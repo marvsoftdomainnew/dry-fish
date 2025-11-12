@@ -1,21 +1,18 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dry_fish/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
 import '../../models/requests/add_to_cart_request.dart';
-import '../../repositories/addtocart_repository.dart';
 import '../../roots/routes.dart';
 import '../../viewmodels/add_to_cart_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/product_details_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
-import 'widgets/card_container.dart';
+import 'widgets/card_container.dart';    
 import 'widgets/cut_card.dart';
 import 'widgets/featureChip.dart';
 import 'widgets/info_cards.dart';
@@ -24,7 +21,7 @@ import 'widgets/weight_chips.dart';
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
 
-  @override
+  @override         
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
@@ -409,7 +406,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           ),
           const SizedBox(height: 12),
           Text(
-            "${product!.description}",
+            "${product.description}",
             style: TextStyle(
               fontSize: 14.sp,
               color: AppColors.darkGrey,
