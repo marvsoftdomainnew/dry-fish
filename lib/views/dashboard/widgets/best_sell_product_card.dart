@@ -35,9 +35,9 @@ class BestSellProductCard extends StatelessWidget {
         Get.toNamed(
           AppRoutes.productDetail,
           arguments: {
-            'productName': title,
-            'imageUrl': imageUrl,
-            'price': double.tryParse(price) ?? 0.0,
+            // 'productName': title,
+            // 'imageUrl': imageUrl,
+            // 'price': double.tryParse(price) ?? 0.0,
             'product_id': productId,
           },
         );

@@ -20,6 +20,7 @@ class ApiConstants {
   static String deleteaddressurl = "$baseUrl/user/deleteaddress";
   static String updateaddressUrl = "$baseUrl/user/editaddress";
   static String getAddressesUrl = "$baseUrl/user/addresses";
+  static String showproductdetailsUrl = "$baseUrl/products";
 
   static String productByCategoryUrl(int categoryId) =>
       "$baseUrl/products/categories/$categoryId";

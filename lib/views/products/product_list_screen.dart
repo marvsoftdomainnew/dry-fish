@@ -181,10 +181,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     onTap: () => Get.toNamed(
                       AppRoutes.productDetail,
                       arguments: {
-                        'productName': product.name,
-                        'imageUrl':
-                            "${ApiConstants.imageBaseUrl}${product.image ?? ""}",
-                        'price': product.price,
+                        // 'productName': product.name,
+                        // 'imageUrl':
+                        //     "${ApiConstants.imageBaseUrl}${product.image ?? ""}",
+                        // 'price': product.price,
                         'product_id': product.id,
                       },
                     ),

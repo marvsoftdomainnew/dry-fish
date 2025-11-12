@@ -1,33 +1,35 @@
 class PlaceorderResponse {
-  final String? status;
+  final bool? status;
   final String? message;
   final Order? order;
 
-  PlaceorderResponse({
-    this.status,
-    this.message,
-    this.order,
-  });
+  PlaceorderResponse({this.status, this.message, this.order});
 
-  factory PlaceorderResponse.fromJson(Map<String, dynamic> json) {
-    final orderData = json['order'];
+  factory PlaceorderResponse.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return PlaceorderResponse();
     return PlaceorderResponse(
-      status: json['status'] as String?,
+      status: json['status'] as bool?,
       message: json['message'] as String?,
-      order: (orderData is Map<String, dynamic>)
-          ? Order.fromJson(orderData)
-          : null,
+      order: json['order'] != null ? Order.fromJson(json['order']) : null,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'message': message,
-      'order': order?.toJson(),                                    
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'status': status,
+        'message': message,
+        'order': order?.toJson(),
+      };
 }
+
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'status': status,
+//       'message': message,
+//       'order': order?.toJson(),                                    
+//     };
+//   }
+// }
 
 class Order {
   final int? id;

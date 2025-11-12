@@ -31,6 +31,7 @@ class PlaceOrderController extends GetxController {
         "Error",
         "An unexpected error occurred: ${e.toString()}",
       );
+      print( "An unexpected error occurred: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }
