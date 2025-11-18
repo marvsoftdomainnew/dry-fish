@@ -16,9 +16,12 @@ import 'package:dry_fish/views/search_screen.dart';
 import 'package:dry_fish/views/splash_screen.dart';
 import 'package:get/get.dart';
 
+import '../views/auth/signup_screen.dart';
+
 class AppRoutes {
   static const splash = '/splash';
   static const login = '/login';
+  static const signup = '/signup';
   static const otpVerification = '/otpVerification';
   static const onboarding = '/onboarding';
   static const dashBoard = '/dashBoard';
@@ -53,6 +56,7 @@ class AppRoutes {
     return [
       _buildPage(name: splash, page: () => SplashScreen()),
       _buildPage(name: login, page: () => LoginScreen()),
+      _buildPage(name: signup, page: () => SignupScreen()),
       _buildPage(name: otpVerification, page: () {final args = Get.arguments as Map<String, dynamic>;return OtpVerificationScreen(phoneNumber: args['phoneNumber']);},),
       _buildPage(name: dashBoard, page: () => DashboardScreen()),
       _buildPage(name: onboarding, page: () => OnboardingScreen()),

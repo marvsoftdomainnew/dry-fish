@@ -5,6 +5,7 @@ class ApiConstants {
 
   // Endpoints
   static const String loginUrl = "$baseUrl/user/login";
+  static const String signupUrl = "$baseUrl/user/register";
   static const String getCategoryUrl = "$baseUrl/user/categories";
   static String placeorderurl = "$baseUrl/user/placeorder";
   static String addtocarturl = "$baseUrl/user/addtocart";

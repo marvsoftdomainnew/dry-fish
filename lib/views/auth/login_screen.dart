@@ -1,3 +1,4 @@
+import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -425,8 +426,8 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const Spacer(),
 
+                  SizedBox(height: screenHeight * 0.15),
                   // Login Button
                   Obx(
                         () => Container(
@@ -479,9 +480,35 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-
                   SizedBox(height: screenHeight * 0.015),
+                  Center(
+                    child: GestureDetector(
+                      onTap: (){Get.toNamed(AppRoutes.signup);},
+                      child: RichText(
+                        text: TextSpan(
+                          style: GoogleFonts.nunito(
+                            fontSize: screenWidth * 0.035,
+                            color: AppColors.darkGrey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          children: [
+                            TextSpan(text: "Don't have an account? "),
+                            TextSpan(
+                              text: "Sign Up",
+                              style: GoogleFonts.nunito(
+                                fontSize: screenWidth * 0.038,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.015),
+                  const Spacer(),
 
                   // Terms
                   Center(
