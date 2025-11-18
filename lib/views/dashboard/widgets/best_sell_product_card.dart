@@ -82,6 +82,8 @@ class BestSellProductCard extends StatelessWidget {
                   SizedBox(height: h * 0.005),
                   Text(
                     subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.nunito(
                       fontSize: w * 0.028,
                       color: AppColors.darkGrey,

@@ -12,7 +12,7 @@ import '../../viewmodels/add_to_cart_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/product_details_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
-import 'widgets/card_container.dart';    
+import 'widgets/card_container.dart';
 import 'widgets/cut_card.dart';
 import 'widgets/featureChip.dart';
 import 'widgets/info_cards.dart';
@@ -21,7 +21,7 @@ import 'widgets/weight_chips.dart';
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
 
-  @override         
+  @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
@@ -102,15 +102,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ),
       ],
     );
-
     await addToCartController.addToCart(request);
   }
 
   void _updateCartTotal() {
     if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
       final cut = cuts[selectedCutIndex.value];
-      final basePrice =
-          double.tryParse(cut["price"].toString()) ?? 0.0; // ✅ fixed
+      final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
       final weightValue = double.parse(
         weights[selectedWeightIndex.value].split(" ")[0],
       );
@@ -128,7 +126,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: Obx(() {
@@ -165,16 +162,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         );
       }),
     );
-
-    // return Scaffold(
-    //   backgroundColor: AppColors.bgColor,
-    //   body: Stack(
-    //     children: [
-    //       _buildScrollContent(h, w),
-    //       _buildFloatingCartBar(),
-    //     ],
-    //   ),
-    // );
   }
 
   Widget _buildScrollContent(double screenHeight, double screenWidth) {
@@ -223,7 +210,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
   Widget _buildSliverAppBar(double screenHeight) {
     final product = productController.productDetails.value;
-
     if (product == null) {
       return SizedBox.shrink();
     }
@@ -276,12 +262,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
   Widget _buildHeroImage() {
     final product = productController.productDetails.value;
-
     if (product == null) {
       return const SizedBox.shrink();
     }
-
-    // ✅ Collect all available images
     final List<String> imageUrls = [
       if (product.image != null && product.image!.isNotEmpty)
         "${ApiConstants.imageBaseUrl}${product.image}",
@@ -290,8 +273,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       if (product.image2 != null && product.image2!.isNotEmpty)
         "${ApiConstants.imageBaseUrl}${product.image2}",
     ];
-
-    // ✅ Agar koi image nahi mili to fallback asset
     if (imageUrls.isEmpty) {
       imageUrls.add("assets/images/banner2.jpg");
     }
@@ -336,7 +317,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.1)],
+                  colors: [AppColors.transparent, AppColors.black.withOpacity(0.1)],
                 ),
               ),
             ),
@@ -347,7 +328,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         height: 250,
         viewportFraction: 1,
         autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 3),
+        autoPlayInterval:  Duration(seconds: 3),
         enlargeCenterPage: false,
       ),
     );
@@ -394,7 +375,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     }
     return CardContainer(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,      
         children: [
           Text(
             "About This Fish",
@@ -405,7 +386,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
           ),
           const SizedBox(height: 12),
-          Text(
+          Text(                                                                                                     
             "${product.description}",
             style: TextStyle(
               fontSize: 14.sp,
@@ -421,7 +402,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               FeatureChip(label: "Quality Assured", icon: Icons.verified),
             ],
           ),
-        ],
+        ], 
       ),
     );
   }
