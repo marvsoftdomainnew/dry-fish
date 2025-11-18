@@ -1,3 +1,5 @@
+import 'package:dry_fish/Constants/app_colors.dart';
+import 'package:dry_fish/constants/api_constants.dart';
 import 'package:dry_fish/roots/routes.dart';
 import 'package:dry_fish/views/cart/widgets/floating_cart_bar.dart';
 import 'package:flutter/material.dart';

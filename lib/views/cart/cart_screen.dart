@@ -136,7 +136,7 @@ class _CartScreenState extends State<CartScreen> {
                                         width: 130,
                                         height: 90,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, _, _) =>
+                                        errorBuilder: (_, __, ___) =>
                                             const Icon(Icons.image, size: 50),
                                       ),
                                     ),

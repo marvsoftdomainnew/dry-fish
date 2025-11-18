@@ -13,6 +13,7 @@ class PlaceOrderController extends GetxController {
   Future<void> placeOrderCont(PlaceOrderRequest request) async {
     isLoading.value = true;
     try {
+      // ✅ FIXED: pass request in API call
       final response = await _repository.placeOrder(request);
 
       if (response.status == "success" ||
@@ -23,7 +24,7 @@ class PlaceOrderController extends GetxController {
       } else {
         SnackbarUtil.showError(
           "Order Failed",
-          response.message ?? "Something went wrong while placing order.",
+  response.message ?? "",
         );
       }
     } catch (e) {
