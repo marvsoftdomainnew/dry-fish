@@ -1,5 +1,5 @@
 class CategoryResponse {
-  final String? status;
+  final bool? status;
   final String? message;
   final List<Category>? categories;
 
@@ -11,7 +11,7 @@ class CategoryResponse {
 
   factory CategoryResponse.fromJson(Map<String, dynamic> json) {
     return CategoryResponse(
-      status: json['status'] as String?,
+      status: json['status'] as bool?,
       message: json['message'] as String?,
       categories: (json['categories'] as List?)
           ?.map((e) => Category.fromJson(e as Map<String, dynamic>))

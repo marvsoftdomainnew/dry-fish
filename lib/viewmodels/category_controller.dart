@@ -12,7 +12,7 @@ class CategoryController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _repository.category();
-      if (response.status == "success") {
+      if (response.status == true) {
         if(response.categories != null &&
             response.categories!.isNotEmpty){
           categoryList.value = response.categories!;
