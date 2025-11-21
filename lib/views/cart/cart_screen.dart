@@ -47,6 +47,16 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // screen visible hote hi every time call
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartitemController.fetchItems();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
@@ -62,13 +72,17 @@ class _CartScreenState extends State<CartScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
-              ),
+              // leading: IconButton(
+              //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+              //   onPressed: () => Navigator.pop(context),
+              // ),
+              iconTheme: IconThemeData(color: AppColors.black),
             )
           : const CustomTextAppBar(title: "Cart"),
       body: Obx(() {
+        print("🔥 Total Price: ${cartitemController.totalPrice.value}");
+        print("🟦 Total Items: ${cartitemController.totalItems.value}");
+
         if (cartitemController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -171,7 +185,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            "₹${item.total.toStringAsFixed(2)}",
+                                            "₹${item.total}",
                                             style: TextStyle(
                                               fontSize: 14.sp,
                                               fontWeight: FontWeight.bold,
@@ -205,14 +219,10 @@ class _CartScreenState extends State<CartScreen> {
                                             .successMessage
                                             .value
                                             .isNotEmpty) {
-                                          ToastUtil.showSuccess(
-                                            removeCartItemController
-                                                .successMessage
-                                                .value,
-                                          );
                                           cartitemController.cartItems.removeAt(
                                             index,
                                           );
+                                          cartitemController.updateTotals();
                                         } else {
                                           ToastUtil.showError(
                                             removeCartItemController
@@ -246,22 +256,20 @@ class _CartScreenState extends State<CartScreen> {
                                               : () async {
                                                   if (item.quantity > 0) {
                                                     decreaseLoading[id] = true;
-
                                                     final oldQty =
                                                         item.quantity;
                                                     item.quantity--;
+
                                                     final double price =
-                                                        double.tryParse(
-                                                          item.product.price
-                                                              .toString(),
-                                                        ) ??
-                                                        0.0;
+                                                        item.price;
                                                     item.total =
                                                         price * item.quantity;
                                                     if (item.quantity == 0) {
                                                       cartitemController
                                                           .cartItems
                                                           .removeAt(index);
+                                                      cartitemController
+                                                          .updateTotals();
                                                     }
                                                     item.total =
                                                         price * item.quantity;
@@ -276,16 +284,13 @@ class _CartScreenState extends State<CartScreen> {
                                                     if (reduceQuantityController
                                                         .isSuccess
                                                         .isTrue) {
-                                                      ToastUtil.showSuccess(
-                                                        reduceQuantityController
-                                                            .message
-                                                            .value,
-                                                      );
+                                                      cartitemController
+                                                          .updateTotals();
                                                     } else {
                                                       item.quantity = oldQty;
                                                       final double price =
                                                           double.tryParse(
-                                                            item.product.price
+                                                            item.total
                                                                 .toString(),
                                                           ) ??
                                                           0.0;
@@ -322,15 +327,11 @@ class _CartScreenState extends State<CartScreen> {
                                               ? null
                                               : () async {
                                                   increaseLoading[id] = true;
-
                                                   final oldQty = item.quantity;
                                                   item.quantity++;
+
                                                   final double price =
-                                                      double.tryParse(
-                                                        item.product.price
-                                                            .toString(),
-                                                      ) ??
-                                                      0.0;
+                                                      item.price;
                                                   item.total =
                                                       price * item.quantity;
 
@@ -344,17 +345,13 @@ class _CartScreenState extends State<CartScreen> {
                                                   if (increaseQuantityController
                                                       .isSuccess
                                                       .isTrue) {
-                                                    ToastUtil.showSuccess(
-                                                      increaseQuantityController
-                                                          .message
-                                                          .value,
-                                                    );
+                                                    cartitemController
+                                                        .updateTotals(); // ADD THIS
                                                   } else {
                                                     item.quantity = oldQty;
                                                     final double price =
                                                         double.tryParse(
-                                                          item.product.price
-                                                              .toString(),
+                                                          item.total.toString(),
                                                         ) ??
                                                         0.0;
                                                     item.total =
@@ -393,6 +390,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ],
             ),
+            // print('Total Price: ${cartitemController.totalPrice}'),
 
             /// ✅ Floating Checkout Bar
             FloatingCartBarWidget(

@@ -41,13 +41,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   final RxInt selectedCutIndex = (-1).obs;
   final RxInt selectedWeightIndex = (-1).obs;
   final RxDouble selectedPrice = 0.0.obs;
+  final RxBool isCalculating = false.obs;
 
   bool _isCollapsed = false;
-  // late String productName;
-  // late String imageUrl;
   late int productId;
-  // late double price;
-
   List<Map<String, dynamic>> cuts = [];
 
   static const List<String> weights = [
@@ -58,15 +55,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     "2 kg",
     "2.5 kg",
   ];
+
   @override
   void initState() {
     super.initState();
+    selectedCutIndex.value = -1;
+    selectedWeightIndex.value = -1;
+    selectedPrice.value = 0.0;
+    isCalculating.value = false;
     final args = Get.arguments ?? {};
     productId = int.tryParse(args['product_id'].toString()) ?? 0;
-
-    // Fetch product details using the controller
     productController.fetchProductDetails(productId.toString());
-
+    cartController.fetchItems();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -76,6 +76,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       curve: Curves.easeInOut,
     );
     _animationController.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartController.fetchItems();
+    });
   }
 
   @override
@@ -106,21 +114,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   void _updateCartTotal() {
+  isCalculating.value = true;
+
+  Future.delayed(const Duration(milliseconds: 200), () {
     if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
       final cut = cuts[selectedCutIndex.value];
       final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
-      final weightValue = double.parse(
-        weights[selectedWeightIndex.value].split(" ")[0],
-      );
+
+      final weightValue =
+          double.tryParse(weights[selectedWeightIndex.value].split(" ")[0]) ?? 0.0;
+
       final total = basePrice * weightValue;
-      cartController.totalItems.value = 1;
-      cartController.totalPrice.value = total;
-      _triggerAddToCart();
+
+      // ❌ DO NOT UPDATE CART TOTAL HERE
+      // cartController.totalItems.value = 1;
+      // cartController.totalPrice.value = total;
+
+      selectedPrice.value = total;   // 🟢 ONLY update local price
     } else {
-      cartController.totalItems.value = 0;
-      cartController.totalPrice.value = 0.0;
+      selectedPrice.value = 0.0;
     }
-  }
+
+    isCalculating.value = false;
+  });
+}
+
+
+  // void _updateCartTotal() async {
+  //   isCalculating.value = true; // 👉 Start Loading
+
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //   // small delay to show loader clearly
+
+  //   if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
+  //     final cut = cuts[selectedCutIndex.value];
+  //     final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
+  //     final weightValue =
+  //         double.tryParse(weights[selectedWeightIndex.value].split(" ")[0]) ??
+  //         0.0;
+
+  //     final total = basePrice * weightValue;
+
+  //     cartController.totalItems.value = 1;
+  //     cartController.totalPrice.value = total;
+  //     // _triggerAddToCart();
+  //   } else {
+  //     cartController.totalItems.value = 0;
+  //     cartController.totalPrice.value = 0.0;
+  //   }
+
+  //   isCalculating.value = false; // 👉 Stop Loading
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +361,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [AppColors.transparent, AppColors.black.withOpacity(0.1)],
+                  colors: [
+                    AppColors.transparent,
+                    AppColors.black.withOpacity(0.1),
+                  ],
                 ),
               ),
             ),
@@ -328,7 +375,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         height: 250,
         viewportFraction: 1,
         autoPlay: true,
-        autoPlayInterval:  Duration(seconds: 3),
+        autoPlayInterval: Duration(seconds: 3),
         enlargeCenterPage: false,
       ),
     );
@@ -375,7 +422,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     }
     return CardContainer(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,      
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "About This Fish",
@@ -386,7 +433,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
           ),
           const SizedBox(height: 12),
-          Text(                                                                                                     
+          Text(
             "${product.description}",
             style: TextStyle(
               fontSize: 14.sp,
@@ -402,7 +449,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               FeatureChip(label: "Quality Assured", icon: Icons.verified),
             ],
           ),
-        ], 
+        ],
       ),
     );
   }
@@ -492,33 +539,125 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   );
 
   Widget _buildFloatingCartBar() => Obx(() {
-    if (selectedCutIndex.value == -1 || selectedWeightIndex.value == -1) {
+    print("🔥 Total Price: ${cartController.totalPrice.value}");
+    print("🟦 Total Items: ${cartController.totalItems.value}");
+    final bool hasCut = selectedCutIndex.value != -1;
+    final bool hasWeight = selectedWeightIndex.value != -1;
+
+    final bool cartHasItems = cartController.cartItems.isNotEmpty;
+
+    if (!cartHasItems && (!hasCut || !hasWeight)) {
       return const SizedBox.shrink();
     }
-    return FloatingCartBarWidget(
-      totalItems: cartController.totalItems,
-      totalPrice: cartController.totalPrice,
-      buttonText: "View Cart",
-      onTap: () {
-        final cut = cuts[selectedCutIndex.value];
-        final weight = weights[selectedWeightIndex.value];
-        final basePrice =
-            double.tryParse(cut["price"].toString()) ?? 0.0; // ✅ fixed
-        final weightVal = double.parse(weight.split(" ")[0]);
-        final total = basePrice * weightVal;
 
-        final cartItem = {
-          // "productName": productName,
-          "cutType": cut["name"],
-          "weight": weight,
-          "pricePerKg": basePrice,
-          "mrp": cut["mrp"],
-          "quantity": 1,
-          "totalPrice": total,
-          // "image": imageUrl,
-        };
-        Get.toNamed(AppRoutes.cart, arguments: {"cartItem": cartItem});
+RxDouble selectedPrice = 0.0.obs;
+    int addCount = 0;
+
+    if (hasCut && hasWeight) {
+      final cut = cuts[selectedCutIndex.value];
+      final weight = weights[selectedWeightIndex.value];
+
+      final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
+      final weightVal = double.parse(weight.split(" ")[0]);
+
+      selectedPrice.value = basePrice * weightVal;
+      addCount = 1;
+    }
+
+    // 🟢 UNIQUE ITEM COUNT (correct)
+    final int finalItems = cartController.cartItems.length + addCount;
+
+    // 🟢 PRICE
+    final double finalPrice = cartController.totalPrice.value + selectedPrice.value;
+    print("$finalPrice");
+    print("${cartController.totalPrice.value} + $selectedPrice.value");
+
+    return FloatingCartBarWidget(
+      totalItems: finalItems.obs,
+      totalPrice: finalPrice.obs,
+      isLoading: addToCartController.isLoading.value,
+      buttonText: hasCut && hasWeight ? "Add to Cart" : "View Cart",
+
+      onTap: () async {
+        if (addToCartController.isLoading.value) return;
+
+        if (cartHasItems && !hasCut && !hasWeight) {
+          Get.toNamed(AppRoutes.cart);
+          return;
+        }
+
+        await _triggerAddToCart();
+        await cartController.fetchItems();
+
+        selectedCutIndex.value = -1;
+        selectedWeightIndex.value = -1;
+
+        Get.toNamed(AppRoutes.cart);
       },
     );
   });
 }
+
+  // Widget _buildFloatingCartBar() => Obx(() {
+  //   final bool hasCut = selectedCutIndex.value != -1;
+  //   final bool hasWeight = selectedWeightIndex.value != -1;
+  //   final bool cartHasItems = cartController.cartItems.isNotEmpty;
+  //   if (!cartHasItems && (!hasCut || !hasWeight)) {
+  //     return const SizedBox.shrink();
+  //   }
+  //   double selectedProductPrice = 0;
+  //   int selectedQty = 0;
+  //   if (hasCut && hasWeight) {
+  //     final cut = cuts[selectedCutIndex.value];
+  //     final weight = weights[selectedWeightIndex.value];
+
+  //     final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
+  //     final weightVal = double.parse(weight.split(" ")[0]);
+
+  //     selectedProductPrice = basePrice * weightVal;
+  //     selectedQty = 1;
+  //   }
+  //   final int finalItems = cartHasItems
+  //       ? cartController.totalItems.value + selectedQty
+  //       : selectedQty;
+
+  //   final double finalPrice = cartHasItems
+  //       ? cartController.totalPrice.value + selectedProductPrice
+  //       : selectedProductPrice;
+  //   final String buttonLabel = !cartHasItems || (hasWeight && hasCut)
+  //       ? "Add to Cart"
+  //       : "View Cart";
+
+  //   return Obx(() {
+  //     return FloatingCartBarWidget(
+  //       isLoading: addToCartController.isLoading.value || isCalculating.value,
+  //       totalItems: finalItems.obs,
+  //       totalPrice: finalPrice.obs,
+  //       buttonText: buttonLabel,
+
+  //       onTap: () async {
+  //         if (addToCartController.isLoading.value) return;
+
+  //         final hasCut = selectedCutIndex.value != -1;
+  //         final hasWeight = selectedWeightIndex.value != -1;
+  //         final hasSelection = hasCut && hasWeight;
+  //         final cartHasItems = cartController.cartItems.isNotEmpty;
+  //         if (!cartHasItems && !hasSelection) return;
+  //         if (cartHasItems && !hasSelection) {
+  //           Get.toNamed(AppRoutes.cart);
+  //           return;
+  //         }
+  //         await _triggerAddToCart();
+
+  //         selectedCutIndex.value = -1;
+  //         selectedWeightIndex.value = -1;
+  //         selectedPrice.value = 0.0;
+  //         cartController.totalItems.value = 0;
+  //         cartController.totalPrice.value = 0.0;
+
+  //         Get.toNamed(AppRoutes.cart);
+  //       },
+  //     );
+  //   });
+  // });
+

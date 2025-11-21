@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final CartItemController cartController = Get.put(CartItemController());
   final CategoryController categoryController = Get.put(CategoryController());
   final ProductsController productsController = Get.put(ProductsController());
@@ -40,14 +40,34 @@ class _HomeScreenState extends State<HomeScreen> {
     {"name": "Sneha Iyer", "rating": 4, "comment": "Great variety, definitely ordering again!"},
   ];
 
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addObserver(this);
+
+  productsController.getProducts();
+  categoryController.getCategory();
+  cartController.fetchItems();  // first time
+}
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   productsController.getProducts();
+  //   categoryController.getCategory();
+  //   cartController.fetchItems();
+  // }
   @override
-  void initState() {
-    super.initState();
-    productsController.getProducts();
-    categoryController.getCategory();
+void dispose() {
+  WidgetsBinding.instance.removeObserver(this);
+  super.dispose();
+}
+@override
+void didChangeAppLifecycleState(AppLifecycleState state) {
+  if (state == AppLifecycleState.resumed) {
     cartController.fetchItems();
   }
-
+}
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -62,8 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: screenHeight * 0.01),
-
-                // 🔸 Carousel Banner
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
                   child: CarouselBanner(
@@ -73,8 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 SizedBox(height: screenHeight * 0.02),
-
-                // 🔸 Bestsellers Section
                 _buildSectionTitle("Bestsellers", "Most popular products near you!"),
                 Padding(
                   padding: EdgeInsets.only(left: screenWidth * 0.03,top: 10),

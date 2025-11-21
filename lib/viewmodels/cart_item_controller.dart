@@ -13,6 +13,7 @@ class CartItemController extends GetxController {
   /// Totals
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
+  // RxDouble totalitemPrice = 0.0.obs;
 
   final Map<int, RxBool> itemLoading = {};
 
@@ -45,15 +46,13 @@ class CartItemController extends GetxController {
     }
   }
 
-  void updateTotals() {
-    totalItems.value = cartItems.fold<int>(
-      0,
-          (sum, item) => sum + (item.quantity),
-    );
+void updateTotals() {
+  totalItems.value = cartItems.length;
 
-    totalPrice.value = cartItems.fold<double>(
-      0.0,
-          (sum, item) => sum + (item.total),
-    );
-  }
+  // Total cart amount
+  totalPrice.value = cartItems.fold<double>(
+    0.0,
+    (sum, item) => sum + item.total,
+  );
+}
 }
