@@ -57,12 +57,11 @@ class RemoveCartItemController extends GetxController {
 
       if (response.status) {
         successMessage.value = response.message;
-        SnackbarUtil.showSuccess("Removed", successMessage.value);   // ✅ Snackbar here
       } else {
         errorMessage.value = response.message.isNotEmpty
             ? response.message
             : "Failed to remove item";
-        SnackbarUtil.showError("Error", errorMessage.value);         // ❌ Snackbar here
+        SnackbarUtil.showError("Error", errorMessage.value);
       }
 
     } catch (e) {
