@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../models/requests/signup_request.dart';
-import '../../roots/routes.dart';
 import '../../viewmodels/signup_controller.dart';
 
 class SignupScreen extends StatefulWidget {

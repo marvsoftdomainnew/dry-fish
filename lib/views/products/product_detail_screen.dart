@@ -188,11 +188,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
         final price = product.price?.toString() ?? 0.0;
 
+        // final image = "${ApiConstants.imageBaseUrl}${product.image}";
+        // final image1 = "${ApiConstants.imageBaseUrl}${product.image1}";
+
         cuts = [
           {
             "name": "Fry Cut",
             "price": price,
-            "image": "assets/images/banner2.jpg",
+            "image":"assets/images/banner2.jpg",
           },
           {
             "name": "Curry Cut",

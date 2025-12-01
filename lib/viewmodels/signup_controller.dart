@@ -39,7 +39,6 @@ import 'package:get/get.dart';
 import '../models/requests/signup_request.dart';
 import '../models/responses/signup_response.dart';
 import '../repositories/signup_repository.dart';
-import '../services/network_exceptions.dart';
 import '../utils/snackbar_util.dart';
 
 

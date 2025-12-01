@@ -395,161 +395,83 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                             ],
                           ),
                           const SizedBox(height: 10),
-
                           Container(
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(14),
-    border: Border.all(color: AppColors.primary),
-    color: AppColors.white,
-  ),
-  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-  child: Column(
-    children: order?.orderItems?.map((item) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Product Image
-            Container(
-              width: 64,
-              height: 56,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F0F4),
-                borderRadius: BorderRadius.circular(12),
-                image: item.product?.image != null
-                    ? DecorationImage(
-                        image: NetworkImage(
-                          '${ApiConstants.imageBaseUrl}${item.product!.image!}',
-                        ),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
-              child: item.product?.image == null
-                  ? const Icon(Icons.image, color: AppColors.black)
-                  : null,
-            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppColors.primary),
+                              color: AppColors.white,
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 64,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF8F0F4),
+                                    borderRadius: BorderRadius.circular(12),
+                                    image:
+                                        order
+                                                ?.orderItems
+                                                ?.first
+                                                .product
+                                                ?.image !=
+                                            null
+                                        ? DecorationImage(
+                                            image: NetworkImage(
+                                              '${ApiConstants.imageBaseUrl}${order!.orderItems!.first.product!.image!}',
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child:
+                                      order?.orderItems?.first.product?.image ==
+                                          null
+                                      ? const Icon(
+                                          Icons.image,
+                                          color: AppColors.black,
+                                        )
+                                      : null,
+                                ),
 
-            const SizedBox(width: 12),
-
-            // Product name + qty
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.product?.name ?? 'Product Name',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.quantity} qty',
-                    style: const TextStyle(
-                      color: AppColors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Price
-            Text(
-              '₹ ${item.total?.toStringAsFixed(2) ?? '0.00'}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList() ?? [],
-  ),
-)
-
-                          // Container(
-                          //   decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(14),
-                          //     border: Border.all(color: AppColors.primary),
-                          //     color: AppColors.white,
-                          //   ),
-                          //   padding: const EdgeInsets.all(10),
-                          //   child: Row(
-                          //     children: [
-                          //       Container(
-                          //         width: 64,
-                          //         height: 56,
-                          //         decoration: BoxDecoration(
-                          //           color: const Color(0xFFF8F0F4),
-                          //           borderRadius: BorderRadius.circular(12),
-                          //           image:
-                          //               order
-                          //                       ?.orderItems
-                          //                       ?.first
-                          //                       .product
-                          //                       ?.image !=
-                          //                   null
-                          //               ? DecorationImage(
-                          //                   image: NetworkImage(
-                          //                     '${ApiConstants.imageBaseUrl}${order!.orderItems!.first.product!.image!}',
-                          //                   ),
-                          //                   fit: BoxFit.cover,
-                          //                 )
-                          //               : null,
-                          //         ),
-                          //         child:
-                          //             order?.orderItems?.first.product?.image ==
-                          //                 null
-                          //             ? const Icon(
-                          //                 Icons.image,
-                          //                 color: AppColors.black,
-                          //               )
-                          //             : null,
-                          //       ),
-
-                          //       const SizedBox(width: 12),
-                          //       Expanded(
-                          //         child: Column(
-                          //           crossAxisAlignment:
-                          //               CrossAxisAlignment.start,
-                          //           children: [
-                          //             Text(
-                          //               order
-                          //                       ?.orderItems
-                          //                       ?.first
-                          //                       .product
-                          //                       ?.name ??
-                          //                   'Product Name',
-                          //               style: const TextStyle(
-                          //                 fontWeight: FontWeight.w700,
-                          //               ),
-                          //             ),
-                          //             SizedBox(height: 4),
-                          //             Text(
-                          //               '${order?.orderItems?.first.quantity ?? 0} qty',
-                          //               style: TextStyle(
-                          //                 color: AppColors.black,
-                          //               ),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //       Text(
-                          //         '₹ ${order?.orderItems?.first.total?.toStringAsFixed(2) ?? '0.00'}',
-                          //         style: TextStyle(
-                          //           fontWeight: FontWeight.w800,
-                          //           fontSize: 16,
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                     
-                     
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        order
+                                                ?.orderItems
+                                                ?.first
+                                                .product
+                                                ?.name ??
+                                            'Product Name',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        '${order?.orderItems?.first.quantity ?? 0} qty',
+                                        style: TextStyle(
+                                          color: AppColors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  '₹ ${order?.orderItems?.first.total?.toStringAsFixed(2) ?? '0.00'}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
