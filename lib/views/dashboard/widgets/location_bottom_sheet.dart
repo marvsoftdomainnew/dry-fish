@@ -64,7 +64,7 @@ class LocationBottomSheet extends StatelessWidget {
 
                 // Subtitle
                 Text(
-                  "We need your location to show you fresh dry fish available in your area",
+                  "We need your location to show you fresh Chavan Brother's Sea Food available in your area",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.nunito(
                     fontSize: 14,
