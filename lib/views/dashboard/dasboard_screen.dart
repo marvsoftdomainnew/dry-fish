@@ -122,12 +122,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //   return;
     // }
 
-    var notificationStatus = await Permission.notification.request();
-    if (notificationStatus.isDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Notification permission is required")),
-      );
-    }
+    // var notificationStatus = await Permission.notification.request();
+    // if (notificationStatus.isDenied) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text("Notification permission is required")),
+    //   );
+    // }
   }
 
   // void _openMapView() {
