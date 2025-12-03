@@ -46,9 +46,7 @@ class LocationBottomSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Animated Location Icon
-                const AnimatedLocationIcon(),
+                AnimatedLocationIcon(),
                 const SizedBox(height: 24),
 
                 // Title
@@ -108,28 +106,29 @@ class LocationBottomSheet extends StatelessWidget {
                     onPressed: isLoading ? null : onUseCurrentLocation,
                     child: isLoading
                         ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
                         : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.my_location_rounded, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          "Use Current Location",
-                          style: GoogleFonts.nunito(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.my_location_rounded, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Use Current Location",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -139,10 +138,7 @@ class LocationBottomSheet extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.grey[300]!,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.grey[300]!, width: 1.5),
                   ),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -177,8 +173,11 @@ class LocationBottomSheet extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.lock_outline_rounded,
-                        size: 14, color: Colors.grey[500]),
+                    Icon(
+                      Icons.lock_outline_rounded,
+                      size: 14,
+                      color: Colors.grey[500],
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       "Your location data is safe with us",
