@@ -1,4 +1,4 @@
-import 'package:dry_fish/roots/routes.dart';
+import 'package:chavan_brothers/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -78,8 +78,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         /// Title
                         Padding(
-                          padding:
-                          EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.1,
+                          ),
                           child: Text(
                             onboardingData[index]["title"]!,
                             textAlign: TextAlign.center,
@@ -95,8 +96,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         /// Subtitle
                         Padding(
-                          padding:
-                          EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.1,
+                          ),
                           child: Text(
                             onboardingData[index]["subtitle"]!,
                             textAlign: TextAlign.center,
@@ -116,11 +118,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Positioned(
                   top: statusBarHeight + 10,
                   right: 16,
-                  child: CustomButton(text: "Skip", onTap: (){Get.offAllNamed(AppRoutes.login);},
-                  width: screenWidth * 0.2,
-                  height: screenHeight * 0.045,
-                  borderRadius: 8,backgroundColor: AppColors.primary.withOpacity(0.2),
-                  textColor: AppColors.grey,)
+                  child: CustomButton(
+                    text: "Skip",
+                    onTap: () {
+                      Get.offAllNamed(AppRoutes.login);
+                    },
+                    width: screenWidth * 0.2,
+                    height: screenHeight * 0.045,
+                    borderRadius: 8,
+                    backgroundColor: AppColors.primary.withOpacity(0.2),
+                    textColor: AppColors.grey,
+                  ),
                 ),
               ],
             ),
@@ -133,14 +141,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               onboardingData.length,
-                  (index) => Container(
+              (index) => Container(
                 margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
                 width: currentIndex == index
                     ? screenWidth * 0.08
                     : screenWidth * 0.015,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: currentIndex == index ? AppColors.primary : AppColors.lightGrey,
+                  color: currentIndex == index
+                      ? AppColors.primary
+                      : AppColors.lightGrey,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -150,8 +160,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           /// Bottom button with SafeArea
           SafeArea(
             child: Padding(
-              padding:  EdgeInsets.only(left: screenWidth * 0.04,right: screenWidth * 0.04,
-              bottom: screenHeight * 0.02),
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.04,
+                right: screenWidth * 0.04,
+                bottom: screenHeight * 0.02,
+              ),
               child: CustomButton(
                 text: currentIndex == onboardingData.length - 1
                     ? "Get Started"

@@ -1,8 +1,8 @@
-import 'package:dry_fish/services/api_service.dart';
+import 'package:chavan_brothers/services/api_service.dart';
 import '../constants/api_constants.dart';
 import '../models/responses/order_details_response.dart';
 
-class OrderDetailRespository{
+class OrderDetailRespository {
   final _dio = ApiService.dio;
 
   Future<OrderDetailsResponse> orderDetail({required String Id}) async {

@@ -1,11 +1,11 @@
 import 'dart:ui';
-import 'package:dry_fish/services/sharedpreferences_service.dart';
-import 'package:dry_fish/views/account/account_screen.dart';
-import 'package:dry_fish/views/cart/cart_screen.dart';
-import 'package:dry_fish/views/dashboard/widgets/cart_badge_icon.dart';
-import 'package:dry_fish/views/dashboard/widgets/dashboard_header.dart';
-import 'package:dry_fish/views/dashboard/widgets/location_bottom_sheet.dart';
-import 'package:dry_fish/views/search_screen.dart';
+import 'package:chavan_brothers/services/sharedpreferences_service.dart';
+import 'package:chavan_brothers/views/account/account_screen.dart';
+import 'package:chavan_brothers/views/cart/cart_screen.dart';
+import 'package:chavan_brothers/views/dashboard/widgets/cart_badge_icon.dart';
+import 'package:chavan_brothers/views/dashboard/widgets/dashboard_header.dart';
+import 'package:chavan_brothers/views/dashboard/widgets/location_bottom_sheet.dart';
+import 'package:chavan_brothers/views/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -114,7 +114,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       debugPrint('Immediate update failed: $e\n$st');
     }
   }
-
 
   /// 🔹 Location Bottom Sheet
   void _showLocationBottomSheet() {

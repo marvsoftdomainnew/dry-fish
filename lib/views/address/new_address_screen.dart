@@ -1,4 +1,4 @@
-import 'package:dry_fish/Constants/app_colors.dart';
+import 'package:chavan_brothers/Constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -39,7 +39,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final controller = Get.put(GetAddressController());
 
   String selectedTag = "HOME";
-  AddressModel? editModel; 
+  AddressModel? editModel;
   bool isEditMode = false;
 
   @override

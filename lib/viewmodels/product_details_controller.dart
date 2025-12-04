@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:dry_fish/models/responses/product_details_response.dart';
-import 'package:dry_fish/repositories/product_details_repository.dart';
+import 'package:chavan_brothers/models/responses/product_details_response.dart';
+import 'package:chavan_brothers/repositories/product_details_repository.dart';
 
 class ProductDetailsController extends GetxController {
   final ProductDetailsRepository _repository = ProductDetailsRepository();

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:dry_fish/Constants/app_colors.dart';
+import 'package:chavan_brothers/Constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constants/app_keys.dart';
@@ -41,21 +41,22 @@ class _SplashScreenState extends State<SplashScreen>
     _initialize();
   }
 
-Future<void> _initialize() async {
-  final internetController = Get.find<InternetController>();
+  Future<void> _initialize() async {
+    final internetController = Get.find<InternetController>();
 
-  await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
 
-  final prefs = await SharedPreferencesService.getInstance();
-  bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+    final prefs = await SharedPreferencesService.getInstance();
+    bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
 
-  if (!isLogged) {
-    Get.offAllNamed(AppRoutes.onboarding);
-  } else {
-    Get.offAllNamed(AppRoutes.dashBoard);
+    if (!isLogged) {
+      Get.offAllNamed(AppRoutes.onboarding);
+    } else {
+      Get.offAllNamed(AppRoutes.dashBoard);
+    }
+    internetController.showPopup = true;
   }
-  internetController.showPopup = true;
-}
+
   @override
   void dispose() {
     _controller.dispose();

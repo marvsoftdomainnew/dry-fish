@@ -1,5 +1,5 @@
-import 'package:dry_fish/models/requests/signup_request.dart';
-import 'package:dry_fish/models/responses/signup_response.dart';
+import 'package:chavan_brothers/models/requests/signup_request.dart';
+import 'package:chavan_brothers/models/responses/signup_response.dart';
 import '../constants/api_constants.dart';
 import '../services/api_service.dart';
 

@@ -1,4 +1,4 @@
-import 'package:dry_fish/services/api_service.dart';
+import 'package:chavan_brothers/services/api_service.dart';
 
 import '../constants/api_constants.dart';
 import '../models/responses/remove_cart_item_response.dart';

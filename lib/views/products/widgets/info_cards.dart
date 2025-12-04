@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/app_colors.dart';
 import 'card_container.dart';
-// import 'icon_box.dart';
 
 class InfoCards extends StatelessWidget {
   final double screenWidth;

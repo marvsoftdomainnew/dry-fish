@@ -1,4 +1,4 @@
-import 'package:dry_fish/models/responses/products_by_category_response.dart';
+import 'package:chavan_brothers/models/responses/products_by_category_response.dart';
 import '../constants/api_constants.dart';
 import '../services/api_service.dart';
 

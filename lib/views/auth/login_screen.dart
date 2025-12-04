@@ -1,4 +1,4 @@
-import 'package:dry_fish/roots/routes.dart';
+import 'package:chavan_brothers/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -380,7 +380,7 @@ class LoginScreen extends StatelessWidget {
 
                   // Password Input
                   Obx(
-                        () => Container(
+                    () => Container(
                       height: screenHeight * 0.065,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -399,8 +399,10 @@ class LoginScreen extends StatelessWidget {
                         obscureText: !loginController.isPasswordVisible.value,
                         onChanged: loginController.onPasswordChanged,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.lock_outline,
-                              color: Colors.grey),
+                          prefixIcon: const Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               loginController.isPasswordVisible.value
@@ -426,11 +428,10 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
 
-
                   SizedBox(height: screenHeight * 0.15),
                   // Login Button
                   Obx(
-                        () => Container(
+                    () => Container(
                       width: double.infinity,
                       height: screenHeight * 0.065,
                       decoration: BoxDecoration(
@@ -447,7 +448,9 @@ class LoginScreen extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: ElevatedButton(
-                          onPressed: loginController.isFormValid && !loginController.isLoading.value
+                          onPressed:
+                              loginController.isFormValid &&
+                                  !loginController.isLoading.value
                               ? () => loginController.login()
                               : null,
                           style: ElevatedButton.styleFrom(
@@ -461,21 +464,21 @@ class LoginScreen extends StatelessWidget {
                           ),
                           child: loginController.isLoading.value
                               ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: AppColors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
                               : Text(
-                            'Login',
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: screenWidth * 0.042,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                                  'Login',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: screenWidth * 0.042,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -483,7 +486,9 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.015),
                   Center(
                     child: GestureDetector(
-                      onTap: (){Get.toNamed(AppRoutes.signup);},
+                      onTap: () {
+                        Get.toNamed(AppRoutes.signup);
+                      },
                       child: RichText(
                         text: TextSpan(
                           style: GoogleFonts.nunito(
@@ -521,7 +526,9 @@ class LoginScreen extends StatelessWidget {
                           height: 1,
                         ),
                         children: [
-                          const TextSpan(text: 'By continuing, you accept our '),
+                          const TextSpan(
+                            text: 'By continuing, you accept our ',
+                          ),
                           TextSpan(
                             text: 'Terms & Conditions',
                             style: GoogleFonts.nunito(

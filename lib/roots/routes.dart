@@ -1,18 +1,18 @@
-import 'package:dry_fish/views/address/new_address_screen.dart';
-import 'package:dry_fish/views/address/saved_address_screen.dart';
-import 'package:dry_fish/views/auth/login_screen.dart';
-// import 'package:dry_fish/views/auth/otp_verification_screen.dart';
-import 'package:dry_fish/views/cart/cart_screen.dart';
-import 'package:dry_fish/views/cart/check_out_screen.dart';
-import 'package:dry_fish/views/contact_us_screen.dart';
-import 'package:dry_fish/views/dashboard/dasboard_screen.dart';
-import 'package:dry_fish/views/onboarding/onboarding_screen.dart';
-import 'package:dry_fish/views/order/order_confirmation_screen.dart';
-import 'package:dry_fish/views/order/order_history_screen.dart';
-import 'package:dry_fish/views/products/product_detail_screen.dart';
-import 'package:dry_fish/views/products/product_list_screen.dart';
-import 'package:dry_fish/views/search_screen.dart';
-import 'package:dry_fish/views/splash_screen.dart';
+import 'package:chavan_brothers/views/address/new_address_screen.dart';
+import 'package:chavan_brothers/views/address/saved_address_screen.dart';
+import 'package:chavan_brothers/views/auth/login_screen.dart';
+// import 'package:chavan_brothers/views/auth/otp_verification_screen.dart';
+import 'package:chavan_brothers/views/cart/cart_screen.dart';
+import 'package:chavan_brothers/views/cart/check_out_screen.dart';
+import 'package:chavan_brothers/views/contact_us_screen.dart';
+import 'package:chavan_brothers/views/dashboard/dasboard_screen.dart';
+import 'package:chavan_brothers/views/onboarding/onboarding_screen.dart';
+import 'package:chavan_brothers/views/order/order_confirmation_screen.dart';
+import 'package:chavan_brothers/views/order/order_history_screen.dart';
+import 'package:chavan_brothers/views/products/product_detail_screen.dart';
+import 'package:chavan_brothers/views/products/product_list_screen.dart';
+import 'package:chavan_brothers/views/search_screen.dart';
+import 'package:chavan_brothers/views/splash_screen.dart';
 import 'package:get/get.dart';
 import '../views/auth/signup_screen.dart';
 
@@ -66,8 +66,7 @@ class AppRoutes {
       _buildPage(name: contact, page: () => ContactUsScreen()),
       _buildPage(name: productScreen, page: () => ProductListScreen()),
       _buildPage(name: productDetail, page: () => ProductDetailScreen()),
-      _buildPage(name: savedaddresses, page: () => SavedAddressesScreen())
-
+      _buildPage(name: savedaddresses, page: () => SavedAddressesScreen()),
     ];
   }
 }

@@ -1,5 +1,5 @@
-import 'package:dry_fish/models/requests/add_to_cart_request.dart';
-import 'package:dry_fish/models/responses/add_to_cart_response.dart';
+import 'package:chavan_brothers/models/requests/add_to_cart_request.dart';
+import 'package:chavan_brothers/models/responses/add_to_cart_response.dart';
 import '../constants/api_constants.dart';
 import '../services/api_service.dart';
 

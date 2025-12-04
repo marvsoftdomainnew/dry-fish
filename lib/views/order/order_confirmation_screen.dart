@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:dry_fish/roots/routes.dart';
+import 'package:chavan_brothers/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sizer/sizer.dart';
@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import '../../constants/api_constants.dart';
 import '../../models/responses/placeorder_response.dart';
 import '../../viewmodels/cancel_order_controller.dart';
+
 class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({super.key});
 
@@ -56,7 +57,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   void _navigateToOrderHistory() {
     Get.offAllNamed(AppRoutes.dashBoard);
   }
-// 
+
+  //
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -142,7 +144,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
                                 // ✅ Show response
                                 if (_cancelOrderController.isCancelled.value) {
-                                                                 } else {
+                                } else {
                                   Get.snackbar(
                                     "Failed",
                                     _cancelOrderController.message.value,
@@ -299,13 +301,13 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children:  [
+                              children: [
                                 Text(
                                   'Order is scheduled',
                                   style: TextStyle(
                                     color: AppColors.black,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 17.sp
+                                    fontSize: 17.sp,
                                   ),
                                 ),
                                 SizedBox(height: 6),
@@ -397,79 +399,93 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                           const SizedBox(height: 10),
 
                           Container(
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(14),
-    border: Border.all(color: AppColors.primary),
-    color: AppColors.white,
-  ),
-  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-  child: Column(
-    children: order?.orderItems?.map((item) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Product Image
-            Container(
-              width: 64,
-              height: 56,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F0F4),
-                borderRadius: BorderRadius.circular(12),
-                image: item.product?.image != null
-                    ? DecorationImage(
-                        image: NetworkImage(
-                          '${ApiConstants.imageBaseUrl}${item.product!.image!}',
-                        ),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
-              child: item.product?.image == null
-                  ? const Icon(Icons.image, color: AppColors.black)
-                  : null,
-            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppColors.primary),
+                              color: AppColors.white,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 8,
+                            ),
+                            child: Column(
+                              children:
+                                  order?.orderItems?.map((item) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 6,
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          // Product Image
+                                          Container(
+                                            width: 64,
+                                            height: 56,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF8F0F4),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              image: item.product?.image != null
+                                                  ? DecorationImage(
+                                                      image: NetworkImage(
+                                                        '${ApiConstants.imageBaseUrl}${item.product!.image!}',
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : null,
+                                            ),
+                                            child: item.product?.image == null
+                                                ? const Icon(
+                                                    Icons.image,
+                                                    color: AppColors.black,
+                                                  )
+                                                : null,
+                                          ),
 
-            const SizedBox(width: 12),
+                                          const SizedBox(width: 12),
 
-            // Product name + qty
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.product?.name ?? 'Product Name',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.quantity} qty',
-                    style: const TextStyle(
-                      color: AppColors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                                          // Product name + qty
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.product?.name ??
+                                                      'Product Name',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${item.quantity} qty',
+                                                  style: const TextStyle(
+                                                    color: AppColors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
 
-            // Price
-            Text(
-              '₹ ${item.total?.toStringAsFixed(2) ?? '0.00'}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList() ?? [],
-  ),
-)
+                                          // Price
+                                          Text(
+                                            '₹ ${item.total?.toStringAsFixed(2) ?? '0.00'}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList() ??
+                                  [],
+                            ),
+                          ),
 
                           // Container(
                           //   decoration: BoxDecoration(
@@ -548,8 +564,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                           //     ],
                           //   ),
                           // ),
-                     
-                     
                         ],
                       ),
                     ),

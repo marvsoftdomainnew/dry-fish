@@ -1,4 +1,4 @@
-import 'package:dry_fish/repositories/products_repository.dart';
+import 'package:chavan_brothers/repositories/products_repository.dart';
 import 'package:get/get.dart';
 import '../models/responses/products_response.dart';
 import '../utils/snackbar_util.dart';

@@ -1,4 +1,4 @@
-import 'package:dry_fish/repositories/category_repository.dart';
+import 'package:chavan_brothers/repositories/category_repository.dart';
 import 'package:get/get.dart';
 import '../models/responses/category_response.dart';
 import '../utils/snackbar_util.dart';
@@ -13,22 +13,18 @@ class CategoryController extends GetxController {
       isLoading.value = true;
       final response = await _repository.category();
       if (response.status == true) {
-        if(response.categories != null &&
-            response.categories!.isNotEmpty){
+        if (response.categories != null && response.categories!.isNotEmpty) {
           categoryList.value = response.categories!;
         }
       } else {
-        SnackbarUtil.showError(
-          "Error",
-          response.message ?? "Unknown error",
-        );
+        SnackbarUtil.showError("Error", response.message ?? "Unknown error");
       }
     } catch (e) {
       SnackbarUtil.showError(
         "Error",
         "Something went wrong while logging out.",
       );
-    }finally{
+    } finally {
       isLoading.value = false;
     }
   }

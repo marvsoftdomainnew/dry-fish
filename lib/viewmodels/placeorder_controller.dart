@@ -1,4 +1,4 @@
-import 'package:dry_fish/roots/routes.dart';
+import 'package:chavan_brothers/roots/routes.dart';
 import 'package:get/get.dart';
 import '../models/requests/place_order_request.dart';
 import '../models/responses/placeorder_response.dart';
@@ -22,17 +22,14 @@ class PlaceOrderController extends GetxController {
         order.value = response.order;
         Get.offAllNamed(AppRoutes.orderConfirmer, arguments: response.order);
       } else {
-        SnackbarUtil.showError(
-          "Order Failed",
-  response.message ?? "",
-        );
+        SnackbarUtil.showError("Order Failed", response.message ?? "");
       }
     } catch (e) {
       SnackbarUtil.showError(
         "Error",
         "An unexpected error occurred: ${e.toString()}",
       );
-      print( "An unexpected error occurred: ${e.toString()}");
+      print("An unexpected error occurred: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

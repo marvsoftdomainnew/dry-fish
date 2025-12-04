@@ -1,7 +1,7 @@
-import 'package:dry_fish/Constants/app_colors.dart';
-import 'package:dry_fish/constants/api_constants.dart';
-import 'package:dry_fish/roots/routes.dart';
-import 'package:dry_fish/views/cart/widgets/floating_cart_bar.dart';
+import 'package:chavan_brothers/Constants/app_colors.dart';
+import 'package:chavan_brothers/constants/api_constants.dart';
+import 'package:chavan_brothers/roots/routes.dart';
+import 'package:chavan_brothers/views/cart/widgets/floating_cart_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

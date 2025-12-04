@@ -1,4 +1,4 @@
-import 'package:dry_fish/views/cart/widgets/floating_cart_bar.dart';
+import 'package:chavan_brothers/views/cart/widgets/floating_cart_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';

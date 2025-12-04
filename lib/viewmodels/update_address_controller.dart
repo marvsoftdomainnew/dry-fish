@@ -1,4 +1,4 @@
-import 'package:dry_fish/utils/snackbar_util.dart';
+import 'package:chavan_brothers/utils/snackbar_util.dart';
 import 'package:get/get.dart';
 import '../models/requests/update_address_request.dart';
 import '../models/responses/update_address_response.dart';
@@ -14,19 +14,18 @@ class UpdateAddressController extends GetxController {
     try {
       isLoading.value = true;
 
-      updateResponse = await _repo.updateAddress(
-        id: id,
-        request: request,
-      );
+      updateResponse = await _repo.updateAddress(id: id, request: request);
 
       if (updateResponse != null && updateResponse!.status) {
         SnackbarUtil.showSuccess("Success", updateResponse!.message);
         return true;
       } else {
-       SnackbarUtil.showError("Failed", updateResponse?.message ?? "Update failed");
+        SnackbarUtil.showError(
+          "Failed",
+          updateResponse?.message ?? "Update failed",
+        );
         return false;
       }
-
     } catch (e) {
       Get.snackbar("Error", "Something went wrong while updating address");
       return false;
