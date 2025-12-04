@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:shimmer/shimmer.dart'; // 👈 Add this import
 import '../../constants/app_keys.dart';
 import '../../models/requests/place_order_request.dart';
 import '../../models/responses/get_addresses_response.dart';
@@ -31,8 +32,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final GetAddressController getAddressController = Get.put(
     GetAddressController(),
   );
-  final TextEditingController instructionsController =
-      TextEditingController(); // 👈 Added
+  final TextEditingController instructionsController = TextEditingController();
 
   AddressModel? selectedAddress;
   String? currentAddressprefs;
@@ -43,7 +43,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cartController.fetchItems();
       getAddressController.fetchAddresses();
-      // loadCurrentAddress();
     });
   }
 
@@ -78,7 +77,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           /// 🧾 Main checkout UI
           Obx(() {
             if (cartController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return _buildShimmerLoading();
             }
 
             if (cartController.cartItems.isEmpty) {
@@ -99,6 +98,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           currentAddressprefs!.isNotEmpty
                       ? currentAddressprefs!
                       : "Add delivery address");
+
             final buttonText = hasAddress ? "Change" : "Add";
 
             final items = cartController.cartItems;
@@ -112,86 +112,87 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                   // 🏠 Address Section
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 2.w,
-                      vertical: 2.5.w,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.borderGrey, width: 1),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 22.sp),
-                        SizedBox(width: 3.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Delivery Address",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: 0.5.h),
-                              Text(
-                                addressText,
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            if (hasAddress) {
-                              final selected = await Get.toNamed(
-                                AppRoutes.savedaddresses,
-                              );
-                              if (selected != null &&
-                                  selected is AddressModel) {
-                                getAddressController.selectAddress(selected.id);
-                              }
-                            } else {
-                              await Get.toNamed(
-                                AppRoutes.newAddress,
-                                arguments: {
-                                  'model': null,
-                                  'currentAddress': currentAddressprefs,
-                                },
-                              );
-
-                              // await Get.toNamed(
-                              //   AppRoutes.newAddress,
-                              //   arguments: {
-                              //     'currentAddress': currentAddressprefs,
-                              //   },
-                              // );
-
-                              // await Get.toNamed(
-                              //   AppRoutes.newAddress,
-                              //   arguments: model,
-                              // );
-                              getAddressController.fetchAddresses();
-                            }
-                          },
-                          child: Text(
-                            buttonText,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green[700],
-                            ),
-                          ),
-                        ),
-                      ],
+  padding: EdgeInsets.symmetric(
+    horizontal: 2.w,
+    vertical: 2.5.w,
+  ),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: AppColors.borderGrey, width: 1),
+  ),
+  child: Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded( // <-- this is key
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.location_on,
+              color: Colors.red,
+              size: 22.sp,
+            ),
+            SizedBox(width: 3.w),
+            Expanded( // <-- ensures text wraps
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Delivery Address",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    addressText,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      TextButton(
+        onPressed: () async {
+          if (hasAddress) {
+            final selected = await Get.toNamed(
+              AppRoutes.savedaddresses,
+            );
+            if (selected != null && selected is AddressModel) {
+              getAddressController.selectAddress(selected.id);
+            }
+          } else {
+            await Get.toNamed(
+              AppRoutes.newAddress,
+              arguments: {
+                'model': null,
+                'currentAddress': currentAddressprefs,
+              },
+            );
+            getAddressController.fetchAddresses();
+          }
+        },
+        child: Text(
+          buttonText,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.green[700],
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
 
                   SizedBox(height: 2.h),
 
@@ -294,7 +295,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                   SizedBox(height: 2.h),
 
-                  // ✍️ Delivery Instructions
                   Text(
                     "Delivery Instructions",
                     style: TextStyle(
@@ -305,7 +305,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   SizedBox(height: 1.h),
                   TextField(
                     controller: instructionsController,
-                    maxLines: 2,
                     decoration: InputDecoration(
                       hintText:
                           "e.g., Please deliver between 5–6 PM or call before delivery",
@@ -324,10 +323,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 2.h),
+                  SizedBox(height: 1.h),
 
                   Container(
-                    padding: EdgeInsets.all(3.w),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 3.w,
+                      vertical: 2.w,
+                    ),
                     margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -539,6 +541,200 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             }),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 1.h),
+
+            // Address Section Shimmer
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(width: 22.sp, height: 22.sp, color: Colors.white),
+                  SizedBox(width: 3.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 30.w,
+                          height: 14.sp,
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 0.5.h),
+                        Container(
+                          width: 70.w,
+                          height: 13.sp,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(width: 15.w, height: 14.sp, color: Colors.white),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            // Order Summary Title Shimmer
+            Container(width: 40.w, height: 18.sp, color: Colors.white),
+
+            SizedBox(height: 1.h),
+
+            // Cart Items Shimmer
+            Expanded(
+              child: ListView.separated(
+                itemCount: 3, // Show 3 shimmer items
+                separatorBuilder: (_, __) => SizedBox(height: 1.h),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 25.w,
+                          height: 9.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 3.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 60.w,
+                                height: 14.sp,
+                                color: Colors.white,
+                              ),
+                              SizedBox(height: 0.5.h),
+                              Container(
+                                width: 40.w,
+                                height: 14.sp,
+                                color: Colors.white,
+                              ),
+                              SizedBox(height: 0.5.h),
+                              Container(
+                                width: 30.w,
+                                height: 14.sp,
+                                color: Colors.white,
+                              ),
+                              SizedBox(height: 0.5.h),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: 15.w,
+                                    height: 13.sp,
+                                    color: Colors.white,
+                                  ),
+                                  Container(
+                                    width: 20.w,
+                                    height: 15.sp,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            // Delivery Instructions Shimmer
+            Container(width: 50.w, height: 14.sp, color: Colors.white),
+
+            SizedBox(height: 1.h),
+
+            Container(
+              width: double.infinity,
+              height: 10.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+            ),
+
+            SizedBox(height: 1.h),
+
+            // Price Summary Shimmer
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.w),
+              margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 30.w,
+                        height: 14.sp,
+                        color: Colors.white,
+                      ),
+                      Container(
+                        width: 15.w,
+                        height: 14.sp,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 1.h),
+                  Container(
+                    width: double.infinity,
+                    height: 1,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 1.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 20.w,
+                        height: 14.sp,
+                        color: Colors.white,
+                      ),
+                      Container(
+                        width: 20.w,
+                        height: 14.sp,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

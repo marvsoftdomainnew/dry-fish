@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/api_constants.dart';
@@ -175,7 +176,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               }
 
               if (productsByCategoryController.products.isEmpty) {
-                return noProductsFound(screenWidth);
+                return noProductsFound();
               }
 
               final products = productsByCategoryController.products;
@@ -285,72 +286,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 
-  Widget noProductsFound(double screenWidth) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Empty illustration
-          Container(
-            height: screenWidth * 0.35,
-            width: screenWidth * 0.35,
-            decoration: BoxDecoration(
-              image: const DecorationImage(
-                image: AssetImage("assets/images/empty.png"), // Add your image
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          Text(
-            "No Products Found",
-            style: TextStyle(
-              fontSize: screenWidth * 0.05,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          Text(
-            "Try selecting a different category!",
-            style: TextStyle(
-              fontSize: screenWidth * 0.035,
-              color: Colors.grey[600],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () {
-              // Optional Refresh
-              productsByCategoryController.selectCategory(
-                productsByCategoryController.selectedCategoryIndex.value,
-              );
-            },
-            child: const Text(
-              "Refresh",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+ Widget noProductsFound() {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only( bottom: 80.0),
+      child: Image.asset(
+        "assets/images/empty.png",
+        height: 15.h,
+        width: 15.h,
+        fit: BoxFit.contain,
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildCategoryShimmer(double screenWidth) {
     return ListView.builder(

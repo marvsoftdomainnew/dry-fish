@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:chavan_brothers/Constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import '../../constants/app_keys.dart';
 import '../../models/requests/add_new_address_request.dart';
 import '../../models/requests/update_address_request.dart';
 import '../../models/responses/get_addresses_response.dart';
 import '../../roots/routes.dart';
+import '../../services/sharedpreferences_service.dart';
 import '../../viewmodels/add_new_addresss_controller.dart';
 import '../../viewmodels/get_address_controller.dart';
 import '../../viewmodels/update_address_controller.dart';
@@ -41,7 +45,6 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   String selectedTag = "HOME";
   AddressModel? editModel;
   bool isEditMode = false;
-
   @override
   void initState() {
     super.initState();
@@ -81,7 +84,80 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
       _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
       selectedTag = "HOME";
     }
+    // Print and fetch actual user data
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferencesService.getInstance();
+
+      // Fetch user data
+      final userData = prefs.getString(
+        AppKeys.user,
+      ); // usually mobile is inside 'user'
+      print("User Data from SharedPreferences: $userData");
+
+      if (userData != null && userData.isNotEmpty) {
+        try {
+          final Map<String, dynamic> userMap = Map<String, dynamic>.from(
+            jsonDecode(userData) as Map<String, dynamic>,
+          );
+          final mobile = userMap['phone'] as String?;
+          final name = userMap['name'] as String?;
+          print("Mobile from SharedPreferences: $mobile");
+          if (mobile != null &&
+              mobile.isNotEmpty &&
+              name != null &&
+              name.isNotEmpty) {
+            setState(() {
+              _mobileController.text = mobile;
+              _nameController.text = name;
+            });
+          }
+        } catch (e) {
+          print("Error parsing user data: $e");
+        }
+      }
+    });
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   final args = Get.arguments ?? {};
+  //   editModel = args['model'] as AddressModel?;
+  //   final currentAddress = args['currentAddress'] as String?;
+
+  //   if (editModel != null) {
+  //     // 🟢 EDIT EXISTING ADDRESS
+  //     isEditMode = true;
+
+  //     _nameController.text = editModel!.name;
+  //     _mobileController.text = editModel!.phone.replaceAll("+91-", "");
+  //     _houseController.text = editModel!.flat;
+  //     _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
+  //     _buildingController.text = editModel!.building;
+  //     _streetController.text = editModel!.street;
+  //     _landmarkController.text = editModel!.landmark;
+  //     _pincodeController.text = editModel!.zip;
+  //     _localityController.text = editModel!.locality;
+  //     selectedTag = editModel!.addressType.toUpperCase();
+  //   } else if (currentAddress != null && currentAddress.isNotEmpty) {
+  //     // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
+  //     final parts = currentAddress.split(',');
+
+  //     _nameController.text = " ";
+  //     _mobileController.text = " ";
+  //     _houseController.text = " ";
+  //     _buildingController.text = " ";
+  //     _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
+  //     _landmarkController.text = " ";
+  //     _localityController.text = parts.length > 0
+  //         ? parts[0].trim()
+  //         : "Building";
+  //     _blockController.text = " ";
+  //     _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
+  //     selectedTag = "HOME";
+  //   }
+  // }
 
   @override
   void dispose() {
