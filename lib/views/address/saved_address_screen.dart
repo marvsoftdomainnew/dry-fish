@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:shimmer/shimmer.dart';
+
 import '../../Constants/app_colors.dart';
 import '../../models/responses/get_addresses_response.dart';
 import '../../roots/routes.dart';
@@ -13,9 +15,8 @@ class SavedAddressesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GetAddressController controller = Get.put(GetAddressController());
-    final DeleteAddressController deleteController = Get.put(
-      DeleteAddressController(),
-    );
+    final DeleteAddressController deleteController =
+        Get.put(DeleteAddressController());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -49,9 +50,12 @@ class SavedAddressesScreen extends StatelessWidget {
         ],
       ),
 
+      // ------------------------------------------------------------------
+      // BODY WITH SHIMMER
+      // ------------------------------------------------------------------
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return _buildShimmerList();
         }
 
         if (controller.addresses.isEmpty) {
@@ -89,6 +93,86 @@ class SavedAddressesScreen extends StatelessWidget {
     );
   }
 
+  // ------------------------------------------------------------------
+  // SHIMMER BUILDER
+  // ------------------------------------------------------------------
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            margin: EdgeInsets.only(bottom: 2.h),
+            padding: EdgeInsets.all(2.h),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon placeholder
+                Container(
+                  width: 22.sp,
+                  height: 22.sp,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                SizedBox(width: 3.w),
+
+                // Text shimmer
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 14.sp,
+                        width: 40.w,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 1.h),
+
+                      Container(
+                        height: 12.sp,
+                        width: 70.w,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 1.h),
+
+                      Container(
+                        height: 12.sp,
+                        width: 50.w,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(width: 3.w),
+
+                // Menu icon shimmer
+                Container(
+                  width: 18.sp,
+                  height: 18.sp,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // ADDRESS CARD UI
+  // ------------------------------------------------------------------
   Widget _addressCard(
     AddressModel model,
     int? selectedId,
@@ -101,8 +185,8 @@ class SavedAddressesScreen extends StatelessWidget {
     IconData icon = model.addressType == "home"
         ? Icons.home_outlined
         : model.addressType == "work"
-        ? Icons.location_city_outlined
-        : Icons.location_on_outlined;
+            ? Icons.location_city_outlined
+            : Icons.location_on_outlined;
 
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
@@ -120,6 +204,7 @@ class SavedAddressesScreen extends StatelessWidget {
           Icon(icon, size: 18.sp, color: Colors.black87),
           SizedBox(width: 3.w),
 
+          // Address Details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,6 +230,7 @@ class SavedAddressesScreen extends StatelessWidget {
             ),
           ),
 
+          // More Options (edit/delete)
           PopupMenuButton(
             icon: isDeleting
                 ? SizedBox(
@@ -155,7 +241,7 @@ class SavedAddressesScreen extends StatelessWidget {
                 : Icon(Icons.more_vert, size: 18.sp, color: Colors.grey[600]),
             onSelected: (value) async {
               if (value == "edit") {
-                final result = Get.toNamed(
+                final result = await Get.toNamed(
                   AppRoutes.newAddress,
                   arguments: {'model': model, 'currentAddress': null},
                 );
@@ -174,7 +260,7 @@ class SavedAddressesScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(Icons.edit, size: 18, color: AppColors.primary),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     const Text("Edit"),
                   ],
                 ),
@@ -183,12 +269,9 @@ class SavedAddressesScreen extends StatelessWidget {
                 value: "delete",
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.delete_outline,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
-                    SizedBox(width: 6),
+                    Icon(Icons.delete_outline,
+                        size: 18, color: AppColors.primary),
+                    const SizedBox(width: 6),
                     const Text("Delete"),
                   ],
                 ),

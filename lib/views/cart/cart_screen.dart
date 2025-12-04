@@ -60,7 +60,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgColor,
+      backgroundColor: AppColors.white,
       appBar: widget.showAppBar
           ? AppBar(
               backgroundColor: AppColors.extraLightestPrimary,
@@ -85,10 +85,29 @@ class _CartScreenState extends State<CartScreen> {
         }
 
         if (cartitemController.cartItems.isEmpty) {
-          return const Center(
-            child: Text(
-              "Your cart is empty",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 80.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/emptycart.png",
+                    height: 20.h,
+                    width: 20.h,
+                    fit: BoxFit.contain,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Your cart is empty",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      color: AppColors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -196,8 +215,6 @@ class _CartScreenState extends State<CartScreen> {
                               ),
 
                               const Divider(height: 1, thickness: 1),
-
-                              /// ✅ Quantity & Remove Section
                               Padding(
                                 padding: const EdgeInsets.all(6),
                                 child: Row(
@@ -309,8 +326,8 @@ class _CartScreenState extends State<CartScreen> {
                                                   height: 20,
                                                   child:
                                                       CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                  ),
+                                                        strokeWidth: 2,
+                                                      ),
                                                 )
                                               : const Icon(Icons.remove),
                                         ),
@@ -367,8 +384,8 @@ class _CartScreenState extends State<CartScreen> {
                                                   height: 20,
                                                   child:
                                                       CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                  ),
+                                                        strokeWidth: 2,
+                                                      ),
                                                 )
                                               : const Icon(Icons.add),
                                         ),
@@ -405,12 +422,7 @@ class _CartScreenState extends State<CartScreen> {
     return Stack(
       children: [
         ListView.builder(
-          padding: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            top: 12,
-            bottom: 12.h,
-          ),
+          padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12.h),
           itemCount: 3, // Show 3 shimmer items
           itemBuilder: (context, index) {
             return Container(
