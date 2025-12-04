@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../constants/app_keys.dart';
 import '../../models/requests/place_order_request.dart';
 import '../../models/responses/get_addresses_response.dart';
@@ -31,8 +32,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final GetAddressController getAddressController = Get.put(
     GetAddressController(),
   );
-  final TextEditingController instructionsController =
-      TextEditingController(); // 👈 Added
+  final TextEditingController instructionsController = TextEditingController();
 
   AddressModel? selectedAddress;
   String? currentAddressprefs;
@@ -43,7 +43,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cartController.fetchItems();
       getAddressController.fetchAddresses();
-      // loadCurrentAddress();
     });
   }
 
@@ -72,13 +71,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ),
       ),
 
-      /// 👇 Body + FloatingCartBarWidget combined
       body: Stack(
         children: [
-          /// 🧾 Main checkout UI
           Obx(() {
             if (cartController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return _buildShimmerLoading();
             }
 
             if (cartController.cartItems.isEmpty) {
@@ -95,10 +92,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
             final addressText = hasAddress && selectedAddress != null
                 ? "${selectedAddress.name}, ${selectedAddress.flat}, ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.zip}"
-                : (currentAddressprefs != null &&
-                          currentAddressprefs!.isNotEmpty
-                      ? currentAddressprefs!
-                      : "Add delivery address");
+                : (currentAddressprefs != null && currentAddressprefs!.isNotEmpty
+                    ? currentAddressprefs!
+                    : "Add delivery address");
             final buttonText = hasAddress ? "Change" : "Add";
 
             final items = cartController.cartItems;
@@ -153,8 +149,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               final selected = await Get.toNamed(
                                 AppRoutes.savedaddresses,
                               );
-                              if (selected != null &&
-                                  selected is AddressModel) {
+                              if (selected != null && selected is AddressModel) {
                                 getAddressController.selectAddress(selected.id);
                               }
                             } else {
@@ -165,18 +160,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   'currentAddress': currentAddressprefs,
                                 },
                               );
-
-                              // await Get.toNamed(
-                              //   AppRoutes.newAddress,
-                              //   arguments: {
-                              //     'currentAddress': currentAddressprefs,
-                              //   },
-                              // );
-
-                              // await Get.toNamed(
-                              //   AppRoutes.newAddress,
-                              //   arguments: model,
-                              // );
                               getAddressController.fetchAddresses();
                             }
                           },
@@ -353,11 +336,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           }),
+          
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Obx(() {
+              if (cartController.isLoading.value) {
+                return _buildFloatingBarShimmer();
+              }
+              
               return FloatingCartBarWidget(
                 totalItems: totalItems.obs,
                 totalPrice: totalAmount.obs,
@@ -378,7 +366,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     );
                     return;
                   }
-                  // Show popup dialog first 👇
+                  
                   bool? isConfirmed = await showDialog<bool>(
                     context: context,
                     barrierDismissible: false,
@@ -539,6 +527,353 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             }),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 1.h),
+
+            // Address Section Shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 2.w,
+                  vertical: 2.5.w,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderGrey, width: 1),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 22.sp,
+                      height: 22.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: 3.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 18,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          SizedBox(height: 0.5.h),
+                          Container(
+                            height: 14,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          SizedBox(height: 0.3.h),
+                          Container(
+                            height: 14,
+                            width: 180,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 30,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            // Order Summary Title Shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 24,
+                width: 120,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            SizedBox(height: 1.h),
+
+            // Cart Items Shimmer
+            Expanded(
+              child: ListView.separated(
+                itemCount: 3, // Show 3 shimmer items
+                separatorBuilder: (_, __) => Divider(
+                  height: 1,
+                  color: Colors.grey[300],
+                ),
+                itemBuilder: (context, index) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 25.w,
+                            height: 9.h,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          SizedBox(width: 3.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 18,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Container(
+                                  height: 14,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Container(
+                                  height: 14,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      height: 14,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[400],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 18,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[400],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            // Delivery Instructions Title Shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 20,
+                width: 150,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            SizedBox(height: 1.h),
+
+            // Instructions Input Shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            // Price Summary Shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                padding: EdgeInsets.all(3.w),
+                margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, blurRadius: 6),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: 18,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        Container(
+                          height: 18,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      height: 1,
+                      color: Colors.grey[300],
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: 20,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        Container(
+                          height: 20,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingBarShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 14,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                SizedBox(height: 4),
+                Container(
+                  height: 20,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              height: 48,
+              width: 120,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

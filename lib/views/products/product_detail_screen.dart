@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart'; // Add this import
+
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
 import '../../models/requests/add_to_cart_request.dart';
@@ -15,7 +17,8 @@ import '../cart/widgets/floating_cart_bar.dart';
 import 'widgets/card_container.dart';
 import 'widgets/cut_card.dart';
 import 'widgets/featureChip.dart';
-import 'widgets/info_cards.dart';
+// import 'widgets/info_cards.dart';
+import 'widgets/shimmer_widget.dart';
 import 'widgets/weight_chips.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -114,57 +117,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   void _updateCartTotal() {
-  isCalculating.value = true;
+    isCalculating.value = true;
 
-  Future.delayed(const Duration(milliseconds: 200), () {
-    if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
-      final cut = cuts[selectedCutIndex.value];
-      final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
+        final cut = cuts[selectedCutIndex.value];
+        final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
 
-      final weightValue =
-          double.tryParse(weights[selectedWeightIndex.value].split(" ")[0]) ?? 0.0;
+        final weightValue =
+            double.tryParse(weights[selectedWeightIndex.value].split(" ")[0]) ??
+                0.0;
 
-      final total = basePrice * weightValue;
+        final total = basePrice * weightValue;
 
-      // ❌ DO NOT UPDATE CART TOTAL HERE
-      // cartController.totalItems.value = 1;
-      // cartController.totalPrice.value = total;
+        selectedPrice.value = total;
+      } else {
+        selectedPrice.value = 0.0;
+      }
 
-      selectedPrice.value = total;   // 🟢 ONLY update local price
-    } else {
-      selectedPrice.value = 0.0;
-    }
-
-    isCalculating.value = false;
-  });
-}
-
-
-  // void _updateCartTotal() async {
-  //   isCalculating.value = true; // 👉 Start Loading
-
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //   // small delay to show loader clearly
-
-  //   if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
-  //     final cut = cuts[selectedCutIndex.value];
-  //     final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
-  //     final weightValue =
-  //         double.tryParse(weights[selectedWeightIndex.value].split(" ")[0]) ??
-  //         0.0;
-
-  //     final total = basePrice * weightValue;
-
-  //     cartController.totalItems.value = 1;
-  //     cartController.totalPrice.value = total;
-  //     // _triggerAddToCart();
-  //   } else {
-  //     cartController.totalItems.value = 0;
-  //     cartController.totalPrice.value = 0.0;
-  //   }
-
-  //   isCalculating.value = false; // 👉 Stop Loading
-  // }
+      isCalculating.value = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,20 +146,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: Obx(() {
-        if (productController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         if (productController.errorMessage.isNotEmpty) {
           return Center(child: Text(productController.errorMessage.value));
         }
 
         final product = productController.productDetails.value;
-        if (product == null) {
-          return const Center(child: Text("No product details found"));
-        }
-
-        final price = product.price?.toString() ?? 0.0;
+        final price = product?.price?.toString() ?? 0.0;
 
         // final image = "${ApiConstants.imageBaseUrl}${product.image}";
         // final image1 = "${ApiConstants.imageBaseUrl}${product.image1}";
@@ -195,7 +160,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           {
             "name": "Fry Cut",
             "price": price,
-            "image":"assets/images/banner2.jpg",
+            "image": "assets/images/banner2.jpg",
           },
           {
             "name": "Curry Cut",
@@ -203,15 +168,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             "image": "assets/images/banner2.jpg",
           },
         ];
-
         return Stack(
-          children: [_buildScrollContent(h, w), _buildFloatingCartBar()],
+          children: [
+            _buildScrollContent(h, w, product != null),
+            _buildFloatingCartBar()
+          ],
         );
       }),
     );
   }
 
-  Widget _buildScrollContent(double screenHeight, double screenWidth) {
+  Widget _buildScrollContent(double screenHeight, double screenWidth, bool hasData) {
     return NotificationListener<ScrollNotification>(
       onNotification: (scroll) {
         if (scroll.metrics.axis == Axis.vertical) {
@@ -225,7 +192,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          _buildSliverAppBar(screenHeight),
+          _buildSliverAppBar(screenHeight, hasData),
           SliverToBoxAdapter(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -235,15 +202,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 7.w),
-                    _buildProductHeader(),
+                    _buildProductHeader(hasData),
                     SizedBox(height: 6.w),
-                    _buildCutSelection(screenHeight),
+                    _buildCutSelection(screenHeight, hasData),
                     SizedBox(height: 6.w),
-                    _buildWeightSelection(),
+                    _buildWeightSelection(hasData),
                     const SizedBox(height: 32),
-                    buildDescriptionSection(),
-                    // const SizedBox(height: 24),
-                    // InfoCards(screenWidth: screenWidth),
+                    buildDescriptionSection(hasData),
                     SizedBox(height: screenHeight * 0.12),
                   ],
                 ),
@@ -255,11 +220,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget _buildSliverAppBar(double screenHeight) {
+  Widget _buildSliverAppBar(double screenHeight, bool hasData) {
     final product = productController.productDetails.value;
-    if (product == null) {
-      return SizedBox.shrink();
+    
+    if (!hasData) {
+      return SliverAppBar(
+        expandedHeight: screenHeight * 0.28,
+        pinned: true,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: FlexibleSpaceBar(
+          background: _buildHeroImageShimmer(),
+        ),
+        leading: Padding(
+          padding: EdgeInsets.only(left: 4.w),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
     }
+    
     return SliverAppBar(
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       expandedHeight: screenHeight * 0.28,
@@ -281,7 +266,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ),
         child: _isCollapsed
             ? Text(
-                product.name ?? "Unknown Product",
+                product!.name ?? "Unknown Product",
                 key: const ValueKey("title"),
                 style: TextStyle(
                   fontSize: 19.sp,
@@ -302,6 +287,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             size: 24,
           ),
           onPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroImageShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(18),
+          ),
+          color: Colors.grey,
         ),
       ),
     );
@@ -378,15 +381,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         height: 250,
         viewportFraction: 1,
         autoPlay: true,
-        autoPlayInterval: Duration(seconds: 3),
+        autoPlayInterval: const Duration(seconds: 3),
         enlargeCenterPage: false,
       ),
     );
   }
 
-  Widget _buildProductHeader() {
-    final product = productController.productDetails.value;
+  Widget _buildProductHeader(bool hasData) {
+    if (!hasData) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerWidget.rectangular(
+            width: 70.w,
+            height: 25.sp,
+          ),
+          SizedBox(height: 1.w),
+          ShimmerWidget.rectangular(
+            width: 50.w,
+            height: 15.sp,
+          ),
+        ],
+      );
+    }
 
+    final product = productController.productDetails.value;
     if (product == null) {
       return const SizedBox.shrink();
     }
@@ -417,12 +436,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget buildDescriptionSection() {
-    final product = productController.productDetails.value;
-
-    if (product == null) {
-      return SizedBox.shrink();
+  Widget buildDescriptionSection(bool hasData) {
+    if (!hasData) {
+      return CardContainer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShimmerWidget.rectangular(
+              width: 40.w,
+              height: 16.sp,
+            ),
+            const SizedBox(height: 12),
+            ShimmerWidget.rectangular(
+              width: double.infinity,
+              height: 60.sp,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                ShimmerWidget.rectangular(
+                  width: 30.w,
+                  height: 32,
+                ),
+                const SizedBox(width: 8),
+                ShimmerWidget.rectangular(
+                  width: 30.w,
+                  height: 32,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
     }
+
+    final product = productController.productDetails.value;
+    if (product == null) {
+      return const SizedBox.shrink();
+    }
+    
     return CardContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,93 +509,153 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget _buildCutSelection(double screenHeight) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "Choose Your Cut",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16.sp,
-          color: AppColors.black,
-        ),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        "Select the perfect cut for your cooking needs",
-        style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
-      ),
-      const SizedBox(height: 20),
-      SizedBox(
-        height: 22.h,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          itemCount: cuts.length,
-          itemBuilder: (_, i) => Obx(() {
-            final selected = selectedCutIndex.value == i;
-            return GestureDetector(
-              onTap: () {
-                selectedCutIndex.value = selected ? -1 : i;
-                selectedPrice.value = selected
-                    ? 0.0
-                    : double.tryParse(cuts[i]["price"].toString()) ??
-                          0.0; // ✅ fixed
-                _updateCartTotal();
-              },
-
-              child: CutCard(
-                cut: cuts[i],
-                isSelected: selected,
-                height: screenHeight,
+  Widget _buildCutSelection(double screenHeight, bool hasData) {
+    if (!hasData) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerWidget.rectangular(
+            width: 40.w,
+            height: 16.sp,
+          ),
+          const SizedBox(height: 8),
+          ShimmerWidget.rectangular(
+            width: 60.w,
+            height: 15.sp,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 22.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: 2,
+              itemBuilder: (_, i) => Container(
+                margin: const EdgeInsets.only(right: 16),
+                child: ShimmerWidget.rectangular(
+                  width: 35.w,
+                  height: 22.h,
+                ),
               ),
-            );
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Choose Your Cut",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16.sp,
+            color: AppColors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Select the perfect cut for your cooking needs",
+          style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          height: 22.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: cuts.length,
+            itemBuilder: (_, i) => Obx(() {
+              final selected = selectedCutIndex.value == i;
+              return GestureDetector(
+                onTap: () {
+                  selectedCutIndex.value = selected ? -1 : i;
+                  selectedPrice.value = selected
+                      ? 0.0
+                      : double.tryParse(cuts[i]["price"].toString()) ??
+                          0.0;
+                  _updateCartTotal();
+                },
+                child: CutCard(
+                  cut: cuts[i],
+                  isSelected: selected,
+                  height: screenHeight,
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeightSelection(bool hasData) {
+    if (!hasData) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerWidget.rectangular(
+            width: 20.w,
+            height: 17.sp,
+          ),
+          const SizedBox(height: 8),
+          ShimmerWidget.rectangular(
+            width: 40.w,
+            height: 15.sp,
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: List.generate(6, (i) => ShimmerWidget.rectangular(
+              width: 20.w,
+              height: 40,
+            )),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Weight",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17.sp,
+            color: AppColors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Select your preferred weight",
+          style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
+        ),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: List.generate(weights.length, (i) {
+            return Obx(() {
+              final selected = selectedWeightIndex.value == i;
+              return WeightChip(
+                label: weights[i],
+                isSelected: selected,
+                onTap: () {
+                  selectedWeightIndex.value = selected ? -1 : i;
+                  _updateCartTotal();
+                },
+              );
+            });
           }),
         ),
-      ),
-    ],
-  );
-
-  Widget _buildWeightSelection() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "Weight",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 17.sp,
-          color: AppColors.black,
-        ),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        "Select your preferred weight",
-        style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
-      ),
-      const SizedBox(height: 20),
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: List.generate(weights.length, (i) {
-          return Obx(() {
-            final selected = selectedWeightIndex.value == i;
-            return WeightChip(
-              label: weights[i],
-              isSelected: selected,
-              onTap: () {
-                selectedWeightIndex.value = selected ? -1 : i;
-                _updateCartTotal();
-              },
-            );
-          });
-        }),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 
   Widget _buildFloatingCartBar() => Obx(() {
-    print("🔥 Total Price: ${cartController.totalPrice.value}");
-    print("🟦 Total Items: ${cartController.totalItems.value}");
     final bool hasCut = selectedCutIndex.value != -1;
     final bool hasWeight = selectedWeightIndex.value != -1;
 
@@ -553,7 +665,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       return const SizedBox.shrink();
     }
 
-RxDouble selectedPrice = 0.0.obs;
+    RxDouble selectedPrice = 0.0.obs;
     int addCount = 0;
 
     if (hasCut && hasWeight) {
@@ -567,20 +679,15 @@ RxDouble selectedPrice = 0.0.obs;
       addCount = 1;
     }
 
-    // 🟢 UNIQUE ITEM COUNT (correct)
     final int finalItems = cartController.cartItems.length + addCount;
-
-    // 🟢 PRICE
-    final double finalPrice = cartController.totalPrice.value + selectedPrice.value;
-    print("$finalPrice");
-    print("${cartController.totalPrice.value} + $selectedPrice.value");
+    final double finalPrice =
+        cartController.totalPrice.value + selectedPrice.value;
 
     return FloatingCartBarWidget(
       totalItems: finalItems.obs,
       totalPrice: finalPrice.obs,
       isLoading: addToCartController.isLoading.value,
       buttonText: hasCut && hasWeight ? "Add to Cart" : "View Cart",
-
       onTap: () async {
         if (addToCartController.isLoading.value) return;
 
@@ -600,67 +707,3 @@ RxDouble selectedPrice = 0.0.obs;
     );
   });
 }
-
-  // Widget _buildFloatingCartBar() => Obx(() {
-  //   final bool hasCut = selectedCutIndex.value != -1;
-  //   final bool hasWeight = selectedWeightIndex.value != -1;
-  //   final bool cartHasItems = cartController.cartItems.isNotEmpty;
-  //   if (!cartHasItems && (!hasCut || !hasWeight)) {
-  //     return const SizedBox.shrink();
-  //   }
-  //   double selectedProductPrice = 0;
-  //   int selectedQty = 0;
-  //   if (hasCut && hasWeight) {
-  //     final cut = cuts[selectedCutIndex.value];
-  //     final weight = weights[selectedWeightIndex.value];
-
-  //     final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
-  //     final weightVal = double.parse(weight.split(" ")[0]);
-
-  //     selectedProductPrice = basePrice * weightVal;
-  //     selectedQty = 1;
-  //   }
-  //   final int finalItems = cartHasItems
-  //       ? cartController.totalItems.value + selectedQty
-  //       : selectedQty;
-
-  //   final double finalPrice = cartHasItems
-  //       ? cartController.totalPrice.value + selectedProductPrice
-  //       : selectedProductPrice;
-  //   final String buttonLabel = !cartHasItems || (hasWeight && hasCut)
-  //       ? "Add to Cart"
-  //       : "View Cart";
-
-  //   return Obx(() {
-  //     return FloatingCartBarWidget(
-  //       isLoading: addToCartController.isLoading.value || isCalculating.value,
-  //       totalItems: finalItems.obs,
-  //       totalPrice: finalPrice.obs,
-  //       buttonText: buttonLabel,
-
-  //       onTap: () async {
-  //         if (addToCartController.isLoading.value) return;
-
-  //         final hasCut = selectedCutIndex.value != -1;
-  //         final hasWeight = selectedWeightIndex.value != -1;
-  //         final hasSelection = hasCut && hasWeight;
-  //         final cartHasItems = cartController.cartItems.isNotEmpty;
-  //         if (!cartHasItems && !hasSelection) return;
-  //         if (cartHasItems && !hasSelection) {
-  //           Get.toNamed(AppRoutes.cart);
-  //           return;
-  //         }
-  //         await _triggerAddToCart();
-
-  //         selectedCutIndex.value = -1;
-  //         selectedWeightIndex.value = -1;
-  //         selectedPrice.value = 0.0;
-  //         cartController.totalItems.value = 0;
-  //         cartController.totalPrice.value = 0.0;
-
-  //         Get.toNamed(AppRoutes.cart);
-  //       },
-  //     );
-  //   });
-  // });
-
