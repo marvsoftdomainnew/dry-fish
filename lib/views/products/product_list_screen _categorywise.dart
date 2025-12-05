@@ -286,15 +286,65 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 
- Widget noProductsFound() {
+  Widget noProductsFound() {
   return Center(
     child: Padding(
-      padding: const EdgeInsets.only( bottom: 80.0),
-      child: Image.asset(
-        "assets/images/empty.png",
-        height: 15.h,
-        width: 15.h,
-        fit: BoxFit.contain,
+      padding: const EdgeInsets.only(bottom: 100),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 🐟 Image
+          Image.asset(
+            "assets/images/empty.png",
+            width: 15.h,
+            fit: BoxFit.contain,
+          ),
+
+          const SizedBox(height: 10),
+
+          // ❗Sorry!
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.grey.shade600,
+                size: 26,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                "Sorry!",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // No Product Found...
+          Text(
+            "No Product Found...",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade700,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            "You Can Try Our Different Product...",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
       ),
     ),
   );
