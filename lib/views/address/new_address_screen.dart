@@ -117,48 +117,6 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
       }
     });
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   final args = Get.arguments ?? {};
-  //   editModel = args['model'] as AddressModel?;
-  //   final currentAddress = args['currentAddress'] as String?;
-
-  //   if (editModel != null) {
-  //     // 🟢 EDIT EXISTING ADDRESS
-  //     isEditMode = true;
-
-  //     _nameController.text = editModel!.name;
-  //     _mobileController.text = editModel!.phone.replaceAll("+91-", "");
-  //     _houseController.text = editModel!.flat;
-  //     _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
-  //     _buildingController.text = editModel!.building;
-  //     _streetController.text = editModel!.street;
-  //     _landmarkController.text = editModel!.landmark;
-  //     _pincodeController.text = editModel!.zip;
-  //     _localityController.text = editModel!.locality;
-  //     selectedTag = editModel!.addressType.toUpperCase();
-  //   } else if (currentAddress != null && currentAddress.isNotEmpty) {
-  //     // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
-  //     final parts = currentAddress.split(',');
-
-  //     _nameController.text = " ";
-  //     _mobileController.text = " ";
-  //     _houseController.text = " ";
-  //     _buildingController.text = " ";
-  //     _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
-  //     _landmarkController.text = " ";
-  //     _localityController.text = parts.length > 0
-  //         ? parts[0].trim()
-  //         : "Building";
-  //     _blockController.text = " ";
-  //     _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
-  //     selectedTag = "HOME";
-  //   }
-  // }
-
   @override
   void dispose() {
     _nameController.dispose();

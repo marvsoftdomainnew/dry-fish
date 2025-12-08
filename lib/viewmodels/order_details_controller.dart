@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../models/responses/order_details_response.dart';
-import '../repositories/order_detail_respository.dart';
+import '../repositories/order_details_repository.dart';
 
 class OrderDetailController extends GetxController {
 
