@@ -37,19 +37,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _isLoading = true;
   String? currentAddressprefs;
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
-    cartController = Get.put(CartItemController(), permanent: false);
-    cartController.fetchItems();
-    Future.microtask(() async {
-      await cartController.fetchItems();
-      await getAddressController.fetchAddresses();
+  cartController = Get.find<CartItemController>();
 
-      setState(() => _isLoading = false);
-    });
-  }
+  Future.microtask(() async {
+    await cartController.fetchItems();
+    await getAddressController.fetchAddresses();
+    setState(() => _isLoading = false);
+  });
+}
 
   double get subtotal =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.total);
