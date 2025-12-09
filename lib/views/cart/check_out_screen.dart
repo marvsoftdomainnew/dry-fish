@@ -37,7 +37,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _isLoading = true;
   String? currentAddressprefs;
-@override
+
+  @override
 void initState() {
   super.initState();
 
@@ -49,6 +50,7 @@ void initState() {
     setState(() => _isLoading = false);
   });
 }
+
 
   double get subtotal =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.total);
@@ -96,17 +98,17 @@ void initState() {
   }
 
   Widget _floatingCartBar() {
-    return Obx(() {
+    // return Obx(() {
       return FloatingCartBarWidget(
-        totalItems: totalItems.obs,
-        totalPrice: totalAmount.obs,
+        totalItems: cartController.totalItems,
+        totalPrice: cartController.totalPrice,
         buttonText: orderController.isLoading.value
             ? "Placing Order..."
             : "Place Order",
         isLoading: orderController.isLoading.value,
         onTap: _onPlaceOrder,
       );
-    });
+    // });
   }
 
   Future<void> _onPlaceOrder() async {
@@ -265,7 +267,9 @@ void initState() {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 1.h),
-                    Container(
+        
+            // Address Card
+            Container(
               padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
@@ -439,7 +443,8 @@ void initState() {
         
             SizedBox(height: 1.h),
             Text("Delivery Instructions"),
-            SizedBox(height: 2.h),
+            SizedBox(height: 1.h),
+        
             TextField(
               controller: instructionsController,
               decoration: InputDecoration(
@@ -457,7 +462,7 @@ void initState() {
               ),
             ),
         
-            SizedBox(height: 1.h),
+            SizedBox(height: 2.h),
         
             Container(
               padding: EdgeInsets.all(12),
@@ -706,6 +711,4 @@ void initState() {
       ),
     );
   }
-
- 
 }

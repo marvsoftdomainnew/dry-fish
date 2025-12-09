@@ -24,6 +24,8 @@ class CartItemController extends GetxController {
   }
 
   Future<void> fetchItems() async {
+      // if (_hasFetched) return; // prevent repeated API calls
+  // _hasFetched = true;
     try {
       isLoading.value = true;
       errorMessage.value = '';
