@@ -7,8 +7,6 @@ import '../../utils/snackbar_util.dart';
 class AddToCartController extends GetxController {
   final AddtocartRepository _repository = AddtocartRepository();
 
-  // AddToCartController({required this.repository});
-
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final response = Rxn<AddToCartResponse>();

@@ -16,6 +16,7 @@ class AccountScreen extends StatefulWidget {
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
+bool isLogged = false;
 
 Future<void> _launchURL(String url) async {
   final Uri uri = Uri.parse(url);
@@ -44,6 +45,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
+    isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
     final userJson = prefs.getString(AppKeys.user);
 
     if (userJson != null) {
@@ -101,17 +103,6 @@ class _AccountScreenState extends State<AccountScreen> {
                 subtitle: "Check your order status",
                 onTap: () => Get.toNamed(AppRoutes.orderHistory),
               ),
-              // _buildMenuItem(
-              //   icon: Icons.card_giftcard,
-              //   title: "Earn Rewards",
-              //   subtitle: "Invite friends and earn rewards",
-              // ),
-              // _buildMenuItem(
-              //   icon: Icons.phone_outlined,
-              //   title: "Contact Us",
-              //   subtitle: "Help regarding your recent purchase",
-              //   onTap: () => Get.toNamed(AppRoutes.contact),
-              // ),
               _buildMenuItem(
                 icon: Icons.location_on_outlined,
                 title: "Saved Addresses",
@@ -139,30 +130,24 @@ class _AccountScreenState extends State<AccountScreen> {
                   );
                 },
               ),
-              // _buildMenuItem(
-              //   icon: Icons.store_outlined,
-              //   title: "Seller Information",
-              //   subtitle: "",
-              // ),
-              // _buildMenuItem(
-              //   icon: Icons.lock_outline,
-              //   title: "Account Privacy",
-              //   subtitle: "",
-              // ),
-              // _buildMenuItem(
-              //   icon: Icons.notifications_active_outlined,
-              //   title: "Notification Preferences",
-              //   subtitle: "",
-              // ),
-              _buildMenuItem(
-                icon: Icons.logout,
-                title: "Logout",
-                subtitle: "",
-                onTap: () {
-                  _showLogoutDialog(context);
-                },
-              ),
-
+              if (!isLogged)
+                _buildMenuItem(
+                  icon: Icons.login,
+                  title: "Sign In",
+                  subtitle: "Login to access your account",
+                  onTap: () {
+                    Get.toNamed(AppRoutes.login, arguments: {"from": "account"});
+                  },
+                )
+              else
+                _buildMenuItem(
+                  icon: Icons.logout,
+                  title: "Logout",
+                  subtitle: "",
+                  onTap: () {
+                    _showLogoutDialog(context);
+                  },
+                ),
               SizedBox(height: 5.h),
 
               Center(
@@ -192,14 +177,6 @@ class _AccountScreenState extends State<AccountScreen> {
                         letterSpacing: 1,
                       ),
                     ),
-                    // SizedBox(height: 0.5.h),
-                    // Text(
-                    //   "v8.0.0.0",
-                    //   style: TextStyle(
-                    //     fontSize: 14.sp,
-                    //     color: Colors.grey[600],
-                    //   ),
-                    // ),
                     SizedBox(height: 2.h),
                   ],
                 ),
@@ -237,7 +214,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 await prefs.remove(AppKeys.token);
                 await prefs.remove(AppKeys.isLogin);
                 await prefs.remove(AppKeys.user);
-                print("👋 User logged out from AccountScreen");
+                // print("👋 User logged out from AccountScreen");
                 Get.offAllNamed(AppRoutes.login);
               },
               child: const Text(

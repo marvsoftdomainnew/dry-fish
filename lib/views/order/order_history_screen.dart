@@ -48,6 +48,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           return _buildShimmerLoading();
         }
 
+        if (orderListController.errorMessage.value == "Please login to view your orders") {
+          return Center(
+            child: Text(
+              "Please login to view your orders",
+              style: TextStyle(fontSize: 15.sp, color: Colors.grey),
+            ),
+          );
+        }
+
         if (orderListController.errorMessage.isNotEmpty) {
           return Center(
             child: Text(

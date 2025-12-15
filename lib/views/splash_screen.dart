@@ -45,15 +45,15 @@ class _SplashScreenState extends State<SplashScreen>
     final internetController = Get.find<InternetController>();
 
     await Future.delayed(const Duration(seconds: 3));
-
-    final prefs = await SharedPreferencesService.getInstance();
-    bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
-
-    if (!isLogged) {
-      Get.offAllNamed(AppRoutes.onboarding);
-    } else {
-      Get.offAllNamed(AppRoutes.dashBoard);
-    }
+    Get.offAllNamed(AppRoutes.dashBoard);
+    // final prefs = await SharedPreferencesService.getInstance();
+    // bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+    //
+    // if (!isLogged) {
+    //   Get.offAllNamed(AppRoutes.onboarding);
+    // } else {
+    //   Get.offAllNamed(AppRoutes.dashBoard);
+    // }
     internetController.showPopup = true;
   }
 

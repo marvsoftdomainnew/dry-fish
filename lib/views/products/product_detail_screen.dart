@@ -8,8 +8,10 @@ import 'package:shimmer/shimmer.dart'; // Add this import
 
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
+import '../../constants/app_keys.dart';
 import '../../models/requests/add_to_cart_request.dart';
 import '../../roots/routes.dart';
+import '../../services/sharedpreferences_service.dart';
 import '../../viewmodels/add_to_cart_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/product_details_controller.dart';
@@ -691,11 +693,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       onTap: () async {
         if (addToCartController.isLoading.value) return;
 
-        if (cartHasItems && !hasCut && !hasWeight) {
-          Get.toNamed(AppRoutes.cart);
-          return;
+        final prefs = await SharedPreferencesService.getInstance();
+        bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+
+        // If adding to cart but not logged in → redirect to login first
+        if (!isLogged) {
+          final result = await Get.toNamed(AppRoutes.login, arguments: {
+            "from": "cart"
+          });
+
+          if (result != true) {
+            return; // user canceled login
+          }
         }
 
+        // 🟢 Login confirmed → Now Add To Cart
         await _triggerAddToCart();
         await cartController.fetchItems();
 

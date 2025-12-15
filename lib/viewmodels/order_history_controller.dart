@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
+import '../constants/app_keys.dart';
 import '../models/responses/order_history_response.dart';
 import '../repositories/order_list_respository.dart';
+import '../services/sharedpreferences_service.dart';
 
 class OrderHistoryController extends GetxController {
   final OrderListRespository repository = OrderListRespository();
@@ -19,6 +21,13 @@ class OrderHistoryController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
+      final prefs = await SharedPreferencesService.getInstance();
+      final isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+
+      if (!isLogged) {
+        errorMessage.value = "Please login to view your orders";
+        return;
+      }
 
       final response = await repository.getorderlist();
 

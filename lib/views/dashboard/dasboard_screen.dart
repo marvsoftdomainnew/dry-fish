@@ -9,6 +9,7 @@ import 'package:chavan_brothers/views/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -16,11 +17,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/app_keys.dart';
+import '../../models/guest_address_model.dart';
 import '../../roots/routes.dart';
-import '../../utils/logger.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import '../../viewmodels/get_address_controller.dart';
+import '../../viewmodels/category_controller.dart';
+import '../../viewmodels/products_controller.dart';
 import 'home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -31,13 +34,12 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardController _dashboardController = Get.put(
-    DashboardController(),
-  );
+  final DashboardController _dashboardController = Get.put(DashboardController());
   final CartItemController _cartItemController = Get.put(CartItemController());
-  final GetAddressController getAddressController = Get.put(
-    GetAddressController(),
-  );
+  final GetAddressController getAddressController = Get.put(GetAddressController());
+  final CategoryController categoryController = Get.put(CategoryController());
+  final ProductsController productsController = Get.put(ProductsController());
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final RxBool isBottomSheetVisible = false.obs;
@@ -46,6 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String currentAddress = "Fetching your location...";
   String street = "Fetching street...";
   Position? currentPosition;
+
   final Rxn<DateTime> _lastBackPressed = Rxn<DateTime>();
 
   final List<Widget> _screens = const [
@@ -58,31 +61,87 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await checkForUpdate();
-      await getAddressController.fetchAddresses();
-      if (getAddressController.addresses.isNotEmpty) {
-        final selected = getAddressController.selectedAddress;
-        if (selected != null) {
-          setState(() {
-            currentAddress =
-                "${selected.flat}, ${selected.street}, ${selected.locality}, ${selected.city}";
-            street = selected.street;
-          });
+
+      final prefs = await SharedPreferencesService.getInstance();
+      bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+
+      print("🔵 DEBUG → isLogged: $isLogged");
+
+      // Always load PUBLIC APIs
+      productsController.getProducts();
+      categoryController.getCategory();
+
+      if (isLogged) {
+        print("🟢 USER MODE → Loading server addresses...");
+
+        await getAddressController.fetchAddresses();
+
+        print("🟢 SERVER ADDRESSES:");
+        if (getAddressController.addresses.isNotEmpty) {
+          for (var a in getAddressController.addresses) {
+            print("➡ Address: ${a.flat}, ${a.street}, ${a.locality}, ${a.city}");
+          }
+        } else {
+          print("⚠ No server addresses found.");
         }
-      } else {
-        // 🔹 No address found → ask location
-        _showLocationBottomSheet();
+
+        if (getAddressController.addresses.isNotEmpty) {
+          final selected = getAddressController.selectedAddress;
+          if (selected != null) {
+            setState(() {
+              currentAddress =
+              "${selected.flat}, ${selected.street}, ${selected.locality}, ${selected.city}";
+              street = selected.street;
+            });
+          }
+        } else {
+          _showLocationBottomSheet();
+        }
+        await _cartItemController.fetchItems();
       }
 
-      _cartItemController.fetchItems();
+      // 🟡 GUEST MODE LOGIC
+      else {
+        print("🟡 GUEST MODE ACTIVE → Checking Hive guest_address box...");
+
+        try {
+          final box = Hive.box<GuestAddressModel>(AppKeys.guestAddress);
+
+          if (box.isNotEmpty) {
+            final guestAddress = box.getAt(0);
+
+            print("🟡 GUEST ADDRESS FOUND IN HIVE:");
+            // print("Name: ${guestAddress?.name}");
+            // print("Flat: ${guestAddress?.flat}");
+            // print("Street: ${guestAddress?.street}");
+            // print("Locality: ${guestAddress?.locality}");
+            // print("Pincode: ${guestAddress?.pincode}");
+
+            setState(() {
+              currentAddress =
+              "${guestAddress?.flat}, ${guestAddress?.street}, ${guestAddress?.locality} - ${guestAddress?.pincode}";
+              street = guestAddress?.street ?? "";
+            });
+          } else {
+            print("⚠ Hive guest_address is empty → Opening location bottom sheet...");
+            _showLocationBottomSheet();
+          }
+        } catch (e) {
+          print("❌ ERROR reading guest Hive data: $e");
+          _showLocationBottomSheet();
+        }
+      }
     });
+
   }
 
+  // APP UPDATE HANDLERS
   Future<void> checkForUpdate() async {
     try {
       final info = await InAppUpdate.checkForUpdate();
-
       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
         if (info.flexibleUpdateAllowed) {
           await startFlexibleUpdate();
@@ -90,32 +149,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           await startImmediateUpdate();
         }
       }
-    } catch (e, st) {
-      debugPrint('Update check failed: $e\n$st');
-    }
+    } catch (_) {}
   }
 
   Future<void> startFlexibleUpdate() async {
     try {
       final result = await InAppUpdate.startFlexibleUpdate();
-
       if (result == AppUpdateResult.success) {
         await InAppUpdate.completeFlexibleUpdate();
       }
-    } catch (e, st) {
-      debugPrint('Flexible update failed: $e\n$st');
-    }
+    } catch (_) {}
   }
 
   Future<void> startImmediateUpdate() async {
     try {
       await InAppUpdate.performImmediateUpdate();
-    } catch (e, st) {
-      debugPrint('Immediate update failed: $e\n$st');
-    }
+    } catch (_) {}
   }
-
-  /// 🔹 Location Bottom Sheet
+  // LOCATION BOTTOM SHEET
   void _showLocationBottomSheet() {
     isBottomSheetVisible.value = true;
 
@@ -126,7 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => Obx(
-        () => LocationBottomSheet(
+            () => LocationBottomSheet(
           isLoading: _isLoadingCurrentLocation.value,
           onUseCurrentLocation: () async {
             _isLoadingCurrentLocation.value = true;
@@ -136,8 +187,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Navigator.pop(context);
           },
           onSelectManual: () {
-            Navigator.pop(context);
-            _requestPermissions();
+            Fluttertoast.showToast(msg: "Coming soon, please select current location");
+            // Navigator.pop(context);
           },
         ),
       ),
@@ -146,38 +197,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  /// 🔹 Request permissions
   Future<void> _requestPermissions() async {
-    var locationStatus = await Permission.locationWhenInUse.request();
-    if (locationStatus.isDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location permission is required")),
-      );
-    }
-    // if (locationStatus.isDenied || locationStatus.isPermanentlyDenied) {
-    //   // 🔹 If user denies → open map view for manual select
-    //   _openMapView();
-    //   return;
-    // }
-
-    // var notificationStatus = await Permission.notification.request();
-    // if (notificationStatus.isDenied) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Notification permission is required")),
-    //   );
-    // }
+    await Permission.locationWhenInUse.request();
   }
 
-  // void _openMapView() {
-  //   Navigator.pop(context); // close bottom sheet if open
-  //
-  //   // 🔹 Navigate to your map view page (replace with your actual screen)
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => MapViewScreen()),
-  //   );
-  // }
-  /// 🔹 Get current location & convert to address
   Future<void> _getCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();
@@ -190,66 +213,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      setState(() => currentPosition = position);
-      appLog("📍 Current Position fetched successfully");
-      appLog("Latitude: ${position.latitude}");
-      appLog("Longitude: ${position.longitude}");
-      appLog("Accuracy: ${position.accuracy} meters");
-      appLog("Timestamp: ${position.timestamp}");
-
+      // print("📍 POSITION → lat: ${position.latitude}, lng: ${position.longitude}");
       final prefs = await SharedPreferencesService.getInstance();
       await prefs.setDouble(AppKeys.latitude, position.latitude);
       await prefs.setDouble(AppKeys.longitude, position.longitude);
-      appLog(
-        "✅ Saved to SharedPreferences: lat=${position.latitude}, long=${position.longitude}",
-      );
+      // print("💾 SAVED → latitude: ${prefs.getDouble(AppKeys.latitude)}");
+      // print("💾 SAVED → longitude: ${prefs.getDouble(AppKeys.longitude)}");
+      final placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      final placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
-        // await prefs.setString(AppKeys.currentAddress, formattedAddress);
-        // await prefs.setString(AppKeys.street, streetAddress);
 
-        // Log each address component separately
-        appLog("🏠 Address Details ↓");
-        appLog("Street: ${place.street}");
-        appLog("SubLocality: ${place.subLocality}");
-        appLog("Locality: ${place.locality}");
-        appLog("SubAdministrativeArea: ${place.subAdministrativeArea}");
-        appLog("AdministrativeArea: ${place.administrativeArea}");
-        appLog("PostalCode: ${place.postalCode}");
-        appLog("Country: ${place.country}");
-        appLog("ISO Country Code: ${place.isoCountryCode}");
-        appLog("Name: ${place.name}");
-        appLog("Thoroughfare: ${place.thoroughfare}");
-        appLog("SubThoroughfare: ${place.subThoroughfare}");
+        final formattedAddress =
+            "${place.subLocality}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+        final streetAddress = place.street ?? "";
+        // print("📍 FORMATTED ADDRESS → $formattedAddress");
+        // print("📍 STREET → $streetAddress");
+        await prefs.setString(AppKeys.currentAddress, formattedAddress);
+        await prefs.setString(AppKeys.street, streetAddress);
+        // print("💾 SAVED currentAddress → ${prefs.getString(AppKeys.currentAddress)}");
+        // print("💾 SAVED street → ${prefs.getString(AppKeys.street)}");
         setState(() {
-          final streetAddress = "${place.street}";
-          final formattedAddress =
-              "${place.subLocality}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
-          prefs.setString(AppKeys.currentAddress, formattedAddress);
-          appLog("✅ Saved to SharedPreferences: ${formattedAddress}");
-          setState(() {
-            street = streetAddress;
-            currentAddress = formattedAddress;
-          });
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Get.toNamed(
-              AppRoutes.newAddress,
-              arguments: {"currentAddress": formattedAddress},
-            );
-          });
+          street = streetAddress;
+          currentAddress = formattedAddress;
+        });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Get.offAllNamed(
+            AppRoutes.newAddress,
+            arguments: {"currentAddress": formattedAddress,
+              "place": place, },
+          );
         });
       }
     } catch (e) {
+      print("❌ ERROR in _getCurrentLocation → $e");
       setState(() => currentAddress = "Error getting location: $e");
     }
   }
-
-  /// 🔹 Handle back press
+  // BACK PRESSED
   Future<bool> _onWillPop() async {
     if (_scaffoldKey.currentState?.isDrawerOpen == true) {
       Navigator.of(context).pop();
@@ -286,7 +290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Stack(
           children: [
             Obx(
-              () => Column(
+                  () => Column(
                 children: [
                   if (_dashboardController.selectedIndex.value == 0)
                     DashboardHeader(
@@ -302,18 +306,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
+
             Obx(
-              () => isBottomSheetVisible.value
+                  () => isBottomSheetVisible.value
                   ? BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                      child: Container(color: Colors.black.withOpacity(0.1)),
-                    )
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(color: Colors.black.withOpacity(0.1)),
+              )
                   : const SizedBox.shrink(),
             ),
           ],
         ),
+
         bottomNavigationBar: Obx(
-          () => BottomNavigationBar(
+              () => BottomNavigationBar(
             backgroundColor: AppColors.white,
             currentIndex: _dashboardController.selectedIndex.value,
             selectedItemColor: AppColors.primary,

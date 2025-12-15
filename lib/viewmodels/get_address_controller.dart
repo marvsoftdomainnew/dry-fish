@@ -14,12 +14,6 @@ class GetAddressController extends GetxController {
 
   var selectedAddressId = Rx<int?>(null);
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchAddresses();
-  }
-
   Future<void> fetchAddresses() async {
     try {
       isLoading.value = true;
@@ -50,3 +44,7 @@ class GetAddressController extends GetxController {
   AddressModel? get selectedAddress =>
       addresses.firstWhereOrNull((a) => a.id == selectedAddressId.value);
 }
+
+
+
+

@@ -21,9 +21,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  final CartItemController cartController = Get.put(CartItemController());
-  final CategoryController categoryController = Get.put(CategoryController());
-  final ProductsController productsController = Get.put(ProductsController());
+  final CategoryController categoryController = Get.find();
+  final ProductsController productsController = Get.find();
+  final CartItemController cartController = Get.find();
+
 
   final RxInt carouselIndex = 0.obs;
 
@@ -40,34 +41,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     {"name": "Sneha Iyer", "rating": 4, "comment": "Great variety, definitely ordering again!"},
   ];
 
-@override
-void initState() {
-  super.initState();
-  WidgetsBinding.instance.addObserver(this);
-
-  productsController.getProducts();
-  categoryController.getCategory();
-  cartController.fetchItems();  // first time
-}
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   productsController.getProducts();
-  //   categoryController.getCategory();
-  //   cartController.fetchItems();
-  // }
   @override
-void dispose() {
-  WidgetsBinding.instance.removeObserver(this);
-  super.dispose();
-}
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-  if (state == AppLifecycleState.resumed) {
-    cartController.fetchItems();
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
-}
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      cartController.fetchItems();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -93,7 +85,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
                 SizedBox(height: screenHeight * 0.02),
                 _buildSectionTitle("Bestsellers", "Most popular products near you!"),
                 Padding(
-                  padding: EdgeInsets.only(left: screenWidth * 0.03,top: 10),
+                  padding: EdgeInsets.only(left: screenWidth * 0.03, top: 10),
                   child: Obx(() {
                     if (productsController.isLoading.value) {
                       return _buildShimmerList(screenHeight, screenWidth);
@@ -126,14 +118,14 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
                   }),
                 ),
 
-                // 🔸 Shop by Category Section
+                // Categories
                 _buildSectionTitle("Shop by category", "Freshest meats and much more!"),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
                   child: CategoryGrid(controller: categoryController),
                 ),
 
-                // 🔸 Customer Reviews Section
+                // Reviews
                 _buildSectionTitle("Customer Reviews", "What our customers say about us"),
                 SizedBox(height: screenHeight * 0.01),
                 SizedBox(
@@ -150,7 +142,6 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
             ),
           ),
 
-          // 🔸 Floating Cart
           FloatingCartBarWidget(
             totalItems: cartController.totalItems,
             totalPrice: cartController.totalPrice,
@@ -197,14 +188,15 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
     ),
   );
 
-  Widget _buildEmptyText(String text, double screenWidth, double screenHeight) => SizedBox(
-    height: screenHeight * 0.1,
-    child: Center(
-      child: Text(
-        text,
-        style: GoogleFonts.nunito(color: AppColors.darkGrey, fontSize: screenWidth * 0.035),
-      ),
-    ),
-  );
+  Widget _buildEmptyText(String text, double screenWidth, double screenHeight) =>
+      SizedBox(
+        height: screenHeight * 0.1,
+        child: Center(
+          child: Text(
+            text,
+            style: GoogleFonts.nunito(
+                color: AppColors.darkGrey, fontSize: screenWidth * 0.035),
+          ),
+        ),
+      );
 }
-

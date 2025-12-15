@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:sizer/sizer.dart';
+import 'constants/app_keys.dart';
 import 'constants/app_strings.dart';
+import 'models/guest_address_model.dart';
 import 'roots/routes.dart';
 import 'utils/thems/app_theme.dart';
 import 'viewmodels/app_state_controller.dart';
@@ -10,6 +14,10 @@ import 'services/sharedpreferences_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(GuestAddressModelAdapter());
+  await Hive.openBox<GuestAddressModel>(AppKeys.guestAddress);
 
   final prefs = await SharedPreferencesService.getInstance();
   final appStateController = AppStateController(prefs);
