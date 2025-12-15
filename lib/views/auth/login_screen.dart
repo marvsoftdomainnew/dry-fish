@@ -448,15 +448,16 @@ class LoginScreen extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: ElevatedButton(
-                          onPressed: loginController.isFormValid &&
-                              !loginController.isLoading.value
+                          onPressed:
+                              loginController.isFormValid &&
+                                  !loginController.isLoading.value
                               ? () async {
-                            final result = await loginController.login();
-                            if (result == true) {
-                              // LoginScreen will close automatically by Get.back(result: true)
-                              return;
-                            }
-                          }
+                                  final result = await loginController.login();
+                                  if (result == true) {
+                                    Get.back(result: true);
+                                    return;
+                                  }
+                                }
                               : null,
 
                           style: ElevatedButton.styleFrom(

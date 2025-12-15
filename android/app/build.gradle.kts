@@ -1,5 +1,7 @@
 import java.util.Properties
 import java.io.FileInputStream
+// import java.io.File
+
 
 plugins {
     id("com.android.application")
@@ -45,6 +47,14 @@ android {
             storePassword = keystoreProperties["storePassword"] as String?
         }
     }
+//     signingConfigs {
+//     create("release") {
+//         keyAlias = keystoreProperties["keyAlias"] as String?
+//         keyPassword = keystoreProperties["keyPassword"] as String?
+//         storeFile = keystoreProperties["storeFile"]?.let { File(it as String) }  // <- File() instead of file()
+//         storePassword = keystoreProperties["storePassword"] as String?
+//     }
+// }
 
     buildTypes {
         getByName("release") {

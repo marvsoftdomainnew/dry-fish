@@ -21,6 +21,7 @@ class ApiConstants {
   static String updateaddressUrl = "$baseUrl/user/editaddress";
   static String getAddressesUrl = "$baseUrl/user/addresses";
   static String showproductdetailsUrl = "$baseUrl/products";
+  static String shopListUrl = "$baseUrl/getshops";
 
   static String productByCategoryUrl(int categoryId) =>
       "$baseUrl/products/categories/$categoryId";

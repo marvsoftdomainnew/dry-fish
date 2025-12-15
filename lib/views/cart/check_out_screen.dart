@@ -8,12 +8,14 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_keys.dart';
 import '../../models/requests/place_order_request.dart';
 import '../../models/responses/get_addresses_response.dart';
+import '../../models/responses/shop_list_response.dart';
 import '../../roots/routes.dart';
 import '../../services/sharedpreferences_service.dart';
 import '../../utils/snackbar_util.dart';
 import '../../viewmodels/get_address_controller.dart';
 import '../../viewmodels/placeorder_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
+import '../../viewmodels/shop_list_controller.dart';
 import 'widgets/floating_cart_bar.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -33,24 +35,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final GetAddressController getAddressController = Get.put(
     GetAddressController(),
   );
+  final ShopListController shopController = Get.put(ShopListController());
+
   final TextEditingController instructionsController = TextEditingController();
 
   bool _isLoading = true;
   String? currentAddressprefs;
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  cartController = Get.find<CartItemController>();
+    cartController = Get.find<CartItemController>();
 
-  Future.microtask(() async {
-    await cartController.fetchItems();
-    await getAddressController.fetchAddresses();
-    setState(() => _isLoading = false);
-  });
-}
+    Future.microtask(() async {
+      await cartController.fetchItems();
+      await getAddressController.fetchAddresses();
+      await shopController.fetchShops(); // Fetch shops
 
+      setState(() => _isLoading = false);
+    });
+  }
 
   double get subtotal =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.total);
@@ -99,15 +104,15 @@ void initState() {
 
   Widget _floatingCartBar() {
     // return Obx(() {
-      return FloatingCartBarWidget(
-        totalItems: cartController.totalItems,
-        totalPrice: cartController.totalPrice,
-        buttonText: orderController.isLoading.value
-            ? "Placing Order..."
-            : "Place Order",
-        isLoading: orderController.isLoading.value,
-        onTap: _onPlaceOrder,
-      );
+    return FloatingCartBarWidget(
+      totalItems: cartController.totalItems,
+      totalPrice: cartController.totalPrice,
+      buttonText: orderController.isLoading.value
+          ? "Placing Order..."
+          : "Place Order",
+      isLoading: orderController.isLoading.value,
+      onTap: _onPlaceOrder,
+    );
     // });
   }
 
@@ -134,6 +139,7 @@ void initState() {
       latitude: prefs.getDouble(AppKeys.latitude),
       longitude: prefs.getDouble(AppKeys.longitude),
       instructions: instructionsController.text,
+      location: shopController.selectedShop.value?.id,
     );
     final latitude = prefs.getDouble(AppKeys.latitude);
     final longitude = prefs.getDouble(AppKeys.longitude);
@@ -260,6 +266,7 @@ void initState() {
     final items = cartController.cartItems;
 
     final buttonText = hasAddress ? "Change" : "Add";
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.w),
       child: SafeArea(
@@ -267,7 +274,7 @@ void initState() {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 1.h),
-        
+
             // Address Card
             Container(
               padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
@@ -319,7 +326,6 @@ void initState() {
                         );
                         if (selected != null && selected is AddressModel) {
                           getAddressController.selectAddress(selected.id);
-                          // Update UI without fetching all addresses again
                           setState(() {});
                         }
                       } else {
@@ -330,7 +336,6 @@ void initState() {
                             'currentAddress': currentAddressprefs,
                           },
                         );
-                        // Fetch addresses only once when coming back
                         getAddressController.fetchAddresses();
                       }
                     },
@@ -346,15 +351,82 @@ void initState() {
                 ],
               ),
             ),
-        
+
             SizedBox(height: 2.h),
-            // 🧾 Order Summary
+
+            // Modern Shop Dropdown
+            Obx(() {
+              if (shopController.isLoading.value) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (shopController.shops.isEmpty) {
+                return Text(
+                  "No shops available",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13.sp),
+                );
+              }
+
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 3,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<Shop>(
+                    value: shopController.selectedShop.value,
+                    isExpanded: true,
+                    hint: Text(
+                      "Select a Shop",
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 24.sp,
+                      color: Colors.grey,
+                    ),
+                    items: shopController.shops.map((shop) {
+                      return DropdownMenuItem<Shop>(
+                        value: shop,
+                        child: Text(
+                          shop.name,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (shop) {
+                      shopController.selectShop(shop!);
+                    },
+                    dropdownColor: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            }),
+            SizedBox(height: 2.h),
+
+            // Order Summary Title
             Text(
               "Order Summary",
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 1.h),
-        
+
             Expanded(
               child: ListView.separated(
                 itemCount: items.length,
@@ -365,7 +437,7 @@ void initState() {
                   final imageUrl = item.product.image.isNotEmpty
                       ? "${ApiConstants.imageBaseUrl}${item.product.image}"
                       : "assets/images/banner2.jpg";
-        
+
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 1.5.h),
                     child: Row(
@@ -413,7 +485,8 @@ void initState() {
                               ),
                               SizedBox(height: 0.5.h),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Qty: ${item.quantity}",
@@ -440,11 +513,11 @@ void initState() {
                 },
               ),
             ),
-        
+
             SizedBox(height: 1.h),
             Text("Delivery Instructions"),
             SizedBox(height: 1.h),
-        
+
             TextField(
               controller: instructionsController,
               decoration: InputDecoration(
@@ -461,9 +534,9 @@ void initState() {
                 contentPadding: EdgeInsets.all(12),
               ),
             ),
-        
+
             SizedBox(height: 2.h),
-        
+
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -484,13 +557,290 @@ void initState() {
                 ],
               ),
             ),
-        
+
             SizedBox(height: 10.h),
           ],
         ),
       ),
     );
   }
+
+  // Widget _buildCheckoutContent() {
+  //   final selectedAddress = getAddressController.selectedAddress;
+  //   final hasAddress = getAddressController.addresses.isNotEmpty;
+
+  //   final addressText = selectedAddress != null
+  //       ? "${selectedAddress.name}, ${selectedAddress.flat}, ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.zip}"
+  //       : "Add delivery address";
+  //   final items = cartController.cartItems;
+
+  //   final buttonText = hasAddress ? "Change" : "Add";
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(horizontal: 4.w),
+  //     child: SafeArea(
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           SizedBox(height: 1.h),
+
+  //           // Address Card
+  //           Container(
+  //             padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(12),
+  //               border: Border.all(color: AppColors.borderGrey, width: 1),
+  //             ),
+  //             child: Row(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Expanded(
+  //                   child: Row(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Icon(Icons.location_on, color: Colors.red, size: 22.sp),
+  //                       SizedBox(width: 3.w),
+  //                       Expanded(
+  //                         child: Column(
+  //                           crossAxisAlignment: CrossAxisAlignment.start,
+  //                           children: [
+  //                             Text(
+  //                               "Delivery Address",
+  //                               style: TextStyle(
+  //                                 fontSize: 14.sp,
+  //                                 fontWeight: FontWeight.w600,
+  //                               ),
+  //                             ),
+  //                             SizedBox(height: 0.5.h),
+  //                             Text(
+  //                               addressText,
+  //                               maxLines: 2,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               style: TextStyle(
+  //                                 fontSize: 13.sp,
+  //                                 color: Colors.grey[700],
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 TextButton(
+  //                   onPressed: () async {
+  //                     if (hasAddress) {
+  //                       final selected = await Get.toNamed(
+  //                         AppRoutes.savedaddresses,
+  //                       );
+  //                       if (selected != null && selected is AddressModel) {
+  //                         getAddressController.selectAddress(selected.id);
+  //                         // Update UI without fetching all addresses again
+  //                         setState(() {});
+  //                       }
+  //                     } else {
+  //                       await Get.toNamed(
+  //                         AppRoutes.newAddress,
+  //                         arguments: {
+  //                           'model': null,
+  //                           'currentAddress': currentAddressprefs,
+  //                         },
+  //                       );
+  //                       // Fetch addresses only once when coming back
+  //                       getAddressController.fetchAddresses();
+  //                     }
+  //                   },
+  //                   child: Text(
+  //                     buttonText,
+  //                     style: TextStyle(
+  //                       fontSize: 14.sp,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: Colors.green[700],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //        Container(
+  //             padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(12),
+  //               border: Border.all(color: AppColors.borderGrey, width: 1),
+  //             ),
+
+  //             Obx(() {
+  //           if (shopController.isLoading.value) {
+  //             return Center(child: CircularProgressIndicator());
+  //           }
+
+  //           if (shopController.shops.isEmpty) {
+  //             return Text("No shops available");
+  //           }
+
+  //           return DropdownButtonFormField<Shop>(
+  //             value: shopController.selectedShop.value,
+  //             decoration: InputDecoration(
+  //               labelText: "Select Shop",
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //             ),
+  //             items: shopController.shops.map((shop) {
+  //               return DropdownMenuItem<Shop>(
+  //                 value: shop,
+  //                 child: Text(shop.name),
+  //               );
+  //             }).toList(),
+  //             onChanged: (shop) {
+  //               shopController.selectShop(shop!);
+  //             },
+  //           );
+  //         }),
+  //        ),
+  //           SizedBox(height: 2.h),
+  //           // 🧾 Order Summary
+  //           Text(
+  //             "Order Summary",
+  //             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+  //           ),
+  //           SizedBox(height: 1.h),
+
+  //           Expanded(
+  //             child: ListView.separated(
+  //               itemCount: items.length,
+  //               separatorBuilder: (_, __) =>
+  //                   Divider(height: 1, color: Colors.grey[300]),
+  //               itemBuilder: (context, index) {
+  //                 final item = items[index];
+  //                 final imageUrl = item.product.image.isNotEmpty
+  //                     ? "${ApiConstants.imageBaseUrl}${item.product.image}"
+  //                     : "assets/images/banner2.jpg";
+
+  //                 return Padding(
+  //                   padding: EdgeInsets.symmetric(vertical: 1.5.h),
+  //                   child: Row(
+  //                     children: [
+  //                       ClipRRect(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         child: Image.network(
+  //                           imageUrl,
+  //                           width: 25.w,
+  //                           height: 9.h,
+  //                           fit: BoxFit.cover,
+  //                           errorBuilder: (_, __, ___) =>
+  //                               const Icon(Icons.image, size: 40),
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 3.w),
+  //                       Expanded(
+  //                         child: Column(
+  //                           crossAxisAlignment: CrossAxisAlignment.start,
+  //                           children: [
+  //                             Text(
+  //                               item.product.name,
+  //                               maxLines: 2,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               style: TextStyle(
+  //                                 fontSize: 14.sp,
+  //                                 fontWeight: FontWeight.bold,
+  //                               ),
+  //                             ),
+  //                             const SizedBox(height: 6),
+  //                             Text(
+  //                               "${item.weight} KG  |  Qty: ${item.quantity}",
+  //                               style: TextStyle(
+  //                                 fontSize: 14.sp,
+  //                                 color: Colors.grey[600],
+  //                               ),
+  //                             ),
+  //                             const SizedBox(height: 6),
+  //                             Text(
+  //                               "Cutting: ${item.cuttingType}",
+  //                               style: TextStyle(
+  //                                 fontSize: 14.sp,
+  //                                 color: Colors.grey[600],
+  //                               ),
+  //                             ),
+  //                             SizedBox(height: 0.5.h),
+  //                             Row(
+  //                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                               children: [
+  //                                 Text(
+  //                                   "Qty: ${item.quantity}",
+  //                                   style: TextStyle(
+  //                                     fontSize: 13.sp,
+  //                                     color: Colors.grey[600],
+  //                                   ),
+  //                                 ),
+  //                                 Text(
+  //                                   "₹${item.total.toStringAsFixed(0)}",
+  //                                   style: TextStyle(
+  //                                     fontSize: 15.sp,
+  //                                     fontWeight: FontWeight.w600,
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+
+  //           SizedBox(height: 1.h),
+  //           Text("Delivery Instructions"),
+  //           SizedBox(height: 1.h),
+
+  //           TextField(
+  //             controller: instructionsController,
+  //             decoration: InputDecoration(
+  //               hintText:
+  //                   "e.g., Please deliver between 5–6 PM or call before delivery",
+  //               hintStyle: TextStyle(fontSize: 13.sp, color: AppColors.grey),
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //                 borderSide: BorderSide(color: AppColors.primary),
+  //               ),
+  //               contentPadding: EdgeInsets.all(12),
+  //             ),
+  //           ),
+
+  //           SizedBox(height: 2.h),
+
+  //           Container(
+  //             padding: EdgeInsets.all(12),
+  //             decoration: BoxDecoration(
+  //               color: Colors.white,
+  //               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+  //               borderRadius: BorderRadius.circular(12),
+  //             ),
+  //             child: Column(
+  //               children: [
+  //                 _priceRow("Item Subtotal", subtotal),
+  //                 Divider(),
+  //                 _priceRow(
+  //                   "Total Amount",
+  //                   totalAmount,
+  //                   isBold: true,
+  //                   color: Colors.green,
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+
+  //           SizedBox(height: 10.h),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _priceRow(
     String title,
