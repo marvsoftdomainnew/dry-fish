@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:chavan_brothers/Constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../constants/app_keys.dart';
 import '../roots/routes.dart';
-import '../services/sharedpreferences_service.dart';
 import '../viewmodels/internet_controller.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -24,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
-      vsync: this,
+      vsync: this,     
     );
 
     _scaleAnimation = Tween<double>(
@@ -32,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
+    _fadeAnimation = Tween<double>(                                                                                              
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
