@@ -26,8 +26,6 @@ Future<void> main() async {
   final internetController = Get.put(InternetController(), permanent: true);
   internetController.showPopup = false;
   runApp(const MyApp());
-
- 
 }
 
 class MyApp extends StatelessWidget {
