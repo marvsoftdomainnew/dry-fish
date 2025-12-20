@@ -17,7 +17,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   Hive.registerAdapter(GuestAddressModelAdapter());
-  await Hive.openBox<GuestAddressModel>(AppKeys.guestAddress);
+  await Hive.openBox<GuestAddressModel>(AppKeys.guestAddress);     
 
   final prefs = await SharedPreferencesService.getInstance();
   final appStateController = AppStateController(prefs);
@@ -29,7 +29,7 @@ Future<void> main() async {
 }
 // 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key}); 
 
   @override
   Widget build(BuildContext context) {

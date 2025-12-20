@@ -171,7 +171,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset("assets/images/qr.jpeg", width: 200, height: 200),
+                  Image.asset("assets/images/qr.png", width: 200, height: 200),
                   const SizedBox(height: 16),
 
                   Container(
@@ -184,7 +184,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     child: Row(
                       children: [
                         const Text(
-                          "warsimeatbazaar@oksbi",
+                          "q113537306@ybl",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -197,7 +197,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             onTap: () async {
                               await Clipboard.setData(
                                 const ClipboardData(
-                                  text: "warsimeatbazaar@oksbi",
+                                  text: "q113537306@ybl",
                                 ),
                               );
                               copied.value = true;
