@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:chavan_brothers/Constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../constants/app_keys.dart';
 import '../roots/routes.dart';
+import '../services/sharedpreferences_service.dart';
 import '../viewmodels/internet_controller.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -43,15 +45,15 @@ class _SplashScreenState extends State<SplashScreen>
     final internetController = Get.find<InternetController>();
 
     await Future.delayed(const Duration(seconds: 3));
-    Get.offAllNamed(AppRoutes.dashBoard);
-    // final prefs = await SharedPreferencesService.getInstance();
-    // bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
-    //
-    // if (!isLogged) {
-    //   Get.offAllNamed(AppRoutes.onboarding);
-    // } else {
-    //   Get.offAllNamed(AppRoutes.dashBoard);
-    // }
+    // Get.offAllNamed(AppRoutes.dashBoard);
+    final prefs = await SharedPreferencesService.getInstance();
+    bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+    
+    if (!isLogged) {
+      Get.offAllNamed(AppRoutes.onboarding);
+    } else {
+      Get.offAllNamed(AppRoutes.dashBoard);
+    }
     internetController.showPopup = true;
   }
 

@@ -121,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: CustomButton(
                     text: "Skip",
                     onTap: () {
-                      Get.offAllNamed(AppRoutes.login);
+                      Get.offAllNamed(AppRoutes.dashBoard);
                     },
                     width: screenWidth * 0.2,
                     height: screenHeight * 0.045,
@@ -172,7 +172,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 withShadow: true,
                 onTap: () {
                   if (currentIndex == onboardingData.length - 1) {
-                    Get.offAllNamed(AppRoutes.login);
+                    Get.offAllNamed(AppRoutes.dashBoard);
                   } else {
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),

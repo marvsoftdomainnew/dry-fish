@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     final appState = Get.find<AppStateController>();
     return Sizer(
       builder: (context, orientation, deviceType) {
-        return Obx(
+        return Obx(                     
           () => GetMaterialApp(
             debugShowCheckedModeBanner: false,
             title: AppStrings.appName,
